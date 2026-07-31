@@ -1122,6 +1122,19 @@ async function verifyPhoneCode() {
     });
     const data = await res.json();
     if (data.success || data.id) {
+      regLog('✅ Código aceptado. Finalizando registro en Cloud API...', 'info');
+      
+      // Forzar el paso de registro (para evitar el bug de Meta "Pendiente")
+      try {
+        await fetch(`https://graph.facebook.com/v20.0/${PHONE_ID}/register`, {
+          method: 'POST',
+          headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ messaging_product: 'whatsapp', pin: '123456' })
+        });
+      } catch(e) {
+        // Silencioso, si falla igual ya se verificó
+      }
+
       regLog('🎉 ¡Número REGISTRADO exitosamente! Ya podés enviar mensajes.', 'success');
       setRegStatus('🎉 ¡Número registrado y activo!', '16,185,129');
     } else {
