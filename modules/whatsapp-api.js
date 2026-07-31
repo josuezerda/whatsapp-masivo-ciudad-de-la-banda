@@ -1,0 +1,222 @@
+/**
+ * modules/whatsapp-api.js
+ * Integración con la API de WhatsApp Business de Meta
+ * Municipalidad de Ciudad de La Banda
+ */
+
+const WhatsAppAPI = (() => {
+
+  // ── CONFIGURACIÓN ─────────────────────────────
+  let config = {
+    phoneNumberId:  '',   // Ingresar en ⚙️ Configuración del dashboard
+    accessToken:    '',   // Ingresar en ⚙️ Configuración del dashboard
+    wabaId:         '',   // Ingresar en ⚙️ Configuración del dashboard
+    webhookToken:   '',
+    appId:          '',
+    apiVersion:     'v20.0',
+  };
+
+  // Cargar config guardada
+  function loadConfig() {
+    const saved = localStorage.getItem('wsp_config');
+    if (saved) config = { ...config, ...JSON.parse(saved) };
+    return config;
+  }
+
+  function saveConfig(newConfig) {
+    config = { ...config, ...newConfig };
+    localStorage.setItem('wsp_config', JSON.stringify(config));
+  }
+
+  function getConfig() { return { ...config }; }
+
+  // ── BASE URL ──────────────────────────────────
+  function baseUrl() {
+    return `https://graph.facebook.com/${config.apiVersion}`;
+  }
+
+  function headers() {
+    return {
+      'Authorization': `Bearer ${config.accessToken}`,
+      'Content-Type': 'application/json',
+    };
+  }
+
+  // ── TEST DE CONEXIÓN ──────────────────────────
+  async function testConnection() {
+    if (!config.accessToken || !config.phoneNumberId) {
+      return { ok: false, error: 'Credenciales incompletas.' };
+    }
+    try {
+      const res = await fetch(
+        `${baseUrl()}/${config.phoneNumberId}?fields=display_phone_number,verified_name,quality_rating`,
+        { headers: headers() }
+      );
+      const data = await res.json();
+      if (data.error) return { ok: false, error: data.error.message };
+      return { ok: true, data };
+    } catch (e) {
+      return { ok: false, error: e.message };
+    }
+  }
+
+  // ── ENVIAR MENSAJE DE TEXTO ───────────────────
+  async function sendTextMessage(to, body) {
+    const payload = {
+      messaging_product: 'whatsapp',
+      to: sanitizePhone(to),
+      type: 'text',
+      text: { body }
+    };
+    return await apiPost(`/${config.phoneNumberId}/messages`, payload);
+  }
+
+  // ── ENVIAR TEMPLATE ───────────────────────────
+  async function sendTemplateMessage(to, templateName, languageCode = 'es_AR', components = []) {
+    const payload = {
+      messaging_product: 'whatsapp',
+      to: sanitizePhone(to),
+      type: 'template',
+      template: {
+        name: templateName,
+        language: { code: languageCode },
+        components,
+      }
+    };
+    return await apiPost(`/${config.phoneNumberId}/messages`, payload);
+  }
+
+  // ── OBTENER TEMPLATES APROBADAS ───────────────
+  async function getTemplates() {
+    if (!config.wabaId) return { ok: false, error: 'WABA ID no configurado.' };
+    try {
+      const res = await fetch(
+        `${baseUrl()}/${config.wabaId}/message_templates?fields=name,status,language,components,category&limit=100`,
+        { headers: headers() }
+      );
+      const data = await res.json();
+      if (data.error) return { ok: false, error: data.error.message };
+      return { ok: true, data: data.data || [] };
+    } catch (e) {
+      return { ok: false, error: e.message };
+    }
+  }
+
+  // ── ENVÍO MASIVO ──────────────────────────────
+  /**
+   * @param {Array} contacts  — [{ phone, nombre, ... }]
+   * @param {string} templateName
+   * @param {string} languageCode
+   * @param {Function} paramBuilder — (contact) => components[]
+   * @param {Function} onProgress   — (sent, total, contact, result) => void
+   * @param {number} batchSize      — mensajes por lote
+   * @param {number} delayMs        — ms entre lotes
+   */
+  async function sendBulkMessages({
+    contacts,
+    templateName,
+    languageCode = 'es_AR',
+    paramBuilder = () => [],
+    onProgress = () => {},
+    batchSize = 30,
+    delayMs = 1200,
+    signal,           // AbortSignal para cancelar
+  }) {
+    const results = [];
+    let sent = 0, failed = 0;
+
+    for (let i = 0; i < contacts.length; i++) {
+      if (signal && signal.aborted) break;
+
+      const contact = contacts[i];
+      try {
+        const components = paramBuilder(contact);
+        const result = await sendTemplateMessage(
+          contact.phone, templateName, languageCode, components
+        );
+        const entry = {
+          ...contact,
+          status: result.ok ? 'sent' : 'error',
+          msgId: result.data?.messages?.[0]?.id || null,
+          error: result.error || null,
+          ts: Date.now(),
+        };
+        results.push(entry);
+        if (result.ok) sent++; else failed++;
+        onProgress(i + 1, contacts.length, contact, entry);
+      } catch (e) {
+        const entry = { ...contact, status: 'error', error: e.message, ts: Date.now() };
+        results.push(entry);
+        failed++;
+        onProgress(i + 1, contacts.length, contact, entry);
+      }
+
+      // Rate limiting: pausa entre lotes
+      if ((i + 1) % batchSize === 0 && i + 1 < contacts.length) {
+        await sleep(delayMs);
+      }
+    }
+
+    return { results, sent, failed, total: contacts.length };
+  }
+
+  // ── OBTENER ESTADO DE MENSAJE ─────────────────
+  async function getMessageStatus(msgId) {
+    try {
+      const res = await fetch(
+        `${baseUrl()}/${msgId}?fields=status`,
+        { headers: headers() }
+      );
+      const data = await res.json();
+      return data;
+    } catch (e) {
+      return { error: e.message };
+    }
+  }
+
+  // ── VERIFICAR WEBHOOK ─────────────────────────
+  function verifyWebhook(mode, token, challenge) {
+    if (mode === 'subscribe' && token === config.webhookToken) {
+      return { ok: true, challenge };
+    }
+    return { ok: false };
+  }
+
+  // ── INTERNOS ──────────────────────────────────
+  async function apiPost(path, payload) {
+    try {
+      const res = await fetch(`${baseUrl()}${path}`, {
+        method: 'POST',
+        headers: headers(),
+        body: JSON.stringify(payload),
+      });
+      const data = await res.json();
+      if (data.error) return { ok: false, error: data.error.message, data };
+      return { ok: true, data };
+    } catch (e) {
+      return { ok: false, error: e.message };
+    }
+  }
+
+  function sanitizePhone(phone) {
+    // Elimina espacios, guiones, paréntesis; conserva el + inicial
+    return phone.toString().replace(/[\s\-().]/g, '');
+  }
+
+  function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+  // ── INICIALIZACIÓN ────────────────────────────
+  loadConfig();
+
+  return {
+    loadConfig, saveConfig, getConfig,
+    testConnection,
+    sendTextMessage, sendTemplateMessage,
+    sendBulkMessages,
+    getTemplates,
+    getMessageStatus,
+    verifyWebhook,
+  };
+})();
+
+export default WhatsAppAPI;

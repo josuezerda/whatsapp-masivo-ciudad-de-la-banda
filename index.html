@@ -1,0 +1,858 @@
+<!DOCTYPE html>
+<html lang="es" dir="ltr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WhatsApp Masivo — Municipalidad de Ciudad de La Banda</title>
+  <meta name="description" content="Sistema de mensajería masiva WhatsApp Business para la Municipalidad de Ciudad de La Banda. Dashboard profesional de gestión de campañas y contactos.">
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
+  <!-- Estilos -->
+  <link rel="stylesheet" href="styles/main.css">
+
+  <!-- Favicon SVG inline -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏛️</text></svg>">
+</head>
+<body>
+
+<!-- ── FONDO ANIMADO ─────────────────────────── -->
+<div class="bg-grid"></div>
+<div class="bg-glow bg-glow-1"></div>
+<div class="bg-glow bg-glow-2"></div>
+<div class="bg-glow bg-glow-3"></div>
+
+<!-- ── APP WRAPPER ──────────────────────────── -->
+<div class="app-wrapper">
+
+  <!-- ══════════════════════════════════════════
+       SIDEBAR
+  ══════════════════════════════════════════ -->
+  <aside class="sidebar" id="sidebar">
+
+    <!-- Logo -->
+    <div class="sidebar-logo">
+      <div class="logo-icon">🏛️</div>
+      <div class="logo-text">
+        <div class="org">Municipalidad de</div>
+        <div class="city">Ciudad de La Banda</div>
+      </div>
+    </div>
+
+    <!-- Navegación -->
+    <nav class="sidebar-nav">
+
+      <div class="nav-section-label">Principal</div>
+
+      <a class="nav-item active" data-view="overview" id="nav-overview">
+        <i data-lucide="layout-dashboard"></i>
+        Panel General
+      </a>
+
+      <a class="nav-item" data-view="send" id="nav-send">
+        <i data-lucide="send"></i>
+        Envío Masivo
+        <span class="nav-badge">LIVE</span>
+      </a>
+
+      <div class="nav-section-label">Gestión</div>
+
+      <a class="nav-item" data-view="database" id="nav-database">
+        <i data-lucide="users"></i>
+        Base de Datos
+        <span class="nav-badge">11.258</span>
+      </a>
+
+      <a class="nav-item" data-view="campaigns" id="nav-campaigns">
+        <i data-lucide="megaphone"></i>
+        Campañas
+      </a>
+
+      <a class="nav-item" data-view="templates" id="nav-templates">
+        <i data-lucide="file-text"></i>
+        Plantillas
+      </a>
+
+      <div class="nav-section-label">Análisis</div>
+
+      <a class="nav-item" data-view="reports" id="nav-reports">
+        <i data-lucide="bar-chart-2"></i>
+        Reportes
+      </a>
+
+      <div class="nav-section-label">Sistema</div>
+
+      <a class="nav-item" data-view="config" id="nav-config">
+        <i data-lucide="settings"></i>
+        Configuración API
+      </a>
+
+    </nav>
+
+    <!-- Footer del Sidebar -->
+    <div class="sidebar-footer">
+      <div class="api-status-pill disconnected" id="api-status-pill">
+        <div class="status-dot"></div>
+        <span class="status-label">API Desconectada</span>
+      </div>
+    </div>
+
+  </aside>
+
+  <!-- ══════════════════════════════════════════
+       MAIN CONTENT
+  ══════════════════════════════════════════ -->
+  <main class="main-content">
+
+    <!-- TOPBAR -->
+    <header class="topbar">
+      <div class="topbar-title">
+        <h1 id="topbar-title">Panel de Control</h1>
+        <p id="topbar-sub">Resumen general del sistema</p>
+      </div>
+      <div class="topbar-actions">
+        <button class="topbar-btn secondary" id="btn-import-csv">
+          <i data-lucide="upload" style="width:15px;height:15px"></i>
+          Importar CSV
+        </button>
+        <button class="topbar-btn gold" id="btn-new-campaign">
+          <i data-lucide="zap" style="width:15px;height:15px"></i>
+          Nueva Campaña
+        </button>
+      </div>
+    </header>
+
+    <!-- PAGE CONTENT -->
+    <div class="page-content">
+
+      <!-- ══════════════════════════════════════
+           VIEW: OVERVIEW
+      ══════════════════════════════════════ -->
+      <section class="view active" id="view-overview">
+
+        <!-- Metrics Grid -->
+        <div class="metrics-grid">
+
+          <div class="metric-card">
+            <div class="metric-icon"><i data-lucide="users"></i></div>
+            <div class="metric-value"><span id="metric-total">0</span></div>
+            <div class="metric-label">Contactos en base de datos</div>
+            <div class="metric-change up">↑ Base activa</div>
+          </div>
+
+          <div class="metric-card gold">
+            <div class="metric-icon"><i data-lucide="send"></i></div>
+            <div class="metric-value"><span id="metric-sent">0</span></div>
+            <div class="metric-label">Mensajes enviados (total)</div>
+            <div class="metric-change up">↑ Acumulado</div>
+          </div>
+
+          <div class="metric-card success">
+            <div class="metric-icon"><i data-lucide="check-circle-2"></i></div>
+            <div class="metric-value"><span id="metric-delivery">0</span>%</div>
+            <div class="metric-label">Tasa de entrega promedio</div>
+            <div class="metric-change neutral">Últimas campañas</div>
+          </div>
+
+          <div class="metric-card info">
+            <div class="metric-icon"><i data-lucide="megaphone"></i></div>
+            <div class="metric-value"><span id="metric-campaigns">0</span></div>
+            <div class="metric-label">Campañas realizadas</div>
+            <div class="metric-change up">↑ Este mes</div>
+          </div>
+
+        </div>
+
+        <!-- Grid 2 columnas -->
+        <div class="grid-2">
+
+          <!-- Campañas Activas -->
+          <div class="card">
+            <div class="card-header">
+              <h2><i data-lucide="activity"></i> Campañas Activas</h2>
+              <button class="btn btn-ghost btn-sm" onclick="window.navigateTo && navigateTo('campaigns')">Ver todas</button>
+            </div>
+            <div id="active-campaigns-list" style="min-height:120px"></div>
+          </div>
+
+          <!-- Distribución por Barrio -->
+          <div class="card">
+            <div class="card-header">
+              <h2><i data-lucide="map-pin"></i> Distribución por Barrio</h2>
+            </div>
+            <div class="card-body">
+              <div class="chart-container">
+                <canvas id="chart-barrios"></canvas>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Gráfico Semanal -->
+        <div class="card">
+          <div class="card-header">
+            <h2><i data-lucide="trending-up"></i> Actividad Últimos 7 Días</h2>
+            <div class="flex gap-8">
+              <span class="badge badge-lavanda">■ Enviados</span>
+              <span class="badge badge-muted">■ Entregados</span>
+              <span class="badge badge-warning">■ Leídos</span>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="chart-container" style="height:260px">
+              <canvas id="chart-activity"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <!-- Highlight de base de datos -->
+        <div class="card" style="background: linear-gradient(135deg, rgba(124,58,237,0.15), rgba(93,33,182,0.08)); border-color: rgba(124,58,237,0.3)">
+          <div class="card-body">
+            <div style="display:flex; align-items:center; gap:32px; flex-wrap:wrap">
+              <div>
+                <div class="big-counter">11.258</div>
+                <div style="font-size:14px; color:var(--text-secondary); margin-top:6px; font-weight:600">Vecinos registrados en la base de datos de Ciudad de La Banda</div>
+              </div>
+              <div style="flex:1; display:grid; grid-template-columns:repeat(3,1fr); gap:20px; min-width:300px">
+                <div style="text-align:center">
+                  <div style="font-size:26px; font-weight:800; color:var(--success)">97.2%</div>
+                  <div class="text-xs text-muted mt-4">Números válidos</div>
+                </div>
+                <div style="text-align:center">
+                  <div style="font-size:26px; font-weight:800; color:var(--lavanda-400)">13</div>
+                  <div class="text-xs text-muted mt-4">Barrios cubiertos</div>
+                </div>
+                <div style="text-align:center">
+                  <div style="font-size:26px; font-weight:800; color:var(--gold-400)">5</div>
+                  <div class="text-xs text-muted mt-4">Categorías</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- ══════════════════════════════════════
+           VIEW: ENVÍO MASIVO
+      ══════════════════════════════════════ -->
+      <section class="view" id="view-send">
+
+        <!-- Wizard Steps -->
+        <div class="wizard-steps">
+          <div class="wizard-step">
+            <div class="step-node active" style="width:34px;height:34px">1</div>
+            <span class="step-label active">Configurar</span>
+          </div>
+          <div class="step-connector"></div>
+          <div class="wizard-step">
+            <div class="step-node" style="width:34px;height:34px">2</div>
+            <span class="step-label">Confirmar</span>
+          </div>
+          <div class="step-connector"></div>
+          <div class="wizard-step">
+            <div class="step-node" style="width:34px;height:34px">3</div>
+            <span class="step-label">Enviar</span>
+          </div>
+        </div>
+
+        <!-- PASO 1 — Configurar -->
+        <div class="wizard-step-content" id="step-1">
+          <div class="grid-2">
+
+            <!-- Formulario -->
+            <div class="card">
+              <div class="card-header">
+                <h2><i data-lucide="settings-2"></i> Configurar Campaña</h2>
+              </div>
+              <div class="card-body flex-col gap-16">
+
+                <div class="form-group">
+                  <label class="form-label" for="send-campaign-name">Nombre de la campaña</label>
+                  <input class="form-input" id="send-campaign-name" type="text"
+                    placeholder="Ej: Aviso Corte de Agua — Agosto 2026">
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label" for="send-template">Plantilla de mensaje</label>
+                  <select class="form-select" id="send-template">
+                    <option value="">— Cargando plantillas —</option>
+                  </select>
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label" for="send-segment">Segmento de destinatarios</label>
+                  <select class="form-select" id="send-segment">
+                    <option value="all">Todos los contactos activos</option>
+                  </select>
+                </div>
+
+                <!-- Variables de la plantilla -->
+                <div id="template-vars-section" style="display:none">
+                  <div class="form-label mb-8">Variables del mensaje</div>
+                  <div id="template-vars-form" class="flex-col gap-12"></div>
+                </div>
+
+                <div style="padding:16px; background:rgba(124,58,237,0.08); border-radius:var(--radius-sm); border:1px solid var(--glass-border)">
+                  <div class="flex-between">
+                    <span class="text-sm text-secondary">Total de destinatarios:</span>
+                    <span style="font-size:22px;font-weight:800;color:var(--lavanda-400)" id="send-count">11.258</span>
+                  </div>
+                </div>
+
+                <button class="btn btn-primary btn-lg" id="btn-wizard-next-1">
+                  Continuar →
+                </button>
+
+              </div>
+            </div>
+
+            <!-- Preview del mensaje -->
+            <div class="card">
+              <div class="card-header">
+                <h2><i data-lucide="smartphone"></i> Vista Previa</h2>
+              </div>
+              <div class="card-body">
+                <div class="template-preview" style="border-radius:var(--radius-md); min-height:200px">
+                  <p style="color:rgba(255,255,255,0.4); font-size:13px; text-align:center; margin-bottom:20px">
+                    Seleccioná una plantilla para ver la vista previa
+                  </p>
+                  <div class="template-bubble" id="template-preview-bubble" style="display:none"></div>
+                </div>
+                <div class="mt-16 flex-col gap-8">
+                  <div class="flex-between">
+                    <span class="text-xs text-muted">Plataforma:</span>
+                    <span class="badge badge-success">✅ WhatsApp Business API</span>
+                  </div>
+                  <div class="flex-between">
+                    <span class="text-xs text-muted">Tipo:</span>
+                    <span class="badge badge-lavanda">Template aprobado</span>
+                  </div>
+                  <div class="flex-between">
+                    <span class="text-xs text-muted">Rate limit:</span>
+                    <span class="text-xs text-secondary">30 msg/seg · 1.000/min</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- PASO 2 — Confirmar -->
+        <div class="wizard-step-content" id="step-2" style="display:none">
+          <div class="card">
+            <div class="card-header">
+              <h2><i data-lucide="check-square"></i> Confirmar Envío</h2>
+            </div>
+            <div class="card-body">
+
+              <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-bottom:28px">
+                <div style="text-align:center;padding:20px;background:rgba(124,58,237,0.08);border-radius:var(--radius-md)">
+                  <div style="font-size:32px;font-weight:800;color:var(--lavanda-400)" id="confirm-count">—</div>
+                  <div class="text-xs text-muted mt-4">Destinatarios</div>
+                </div>
+                <div style="text-align:center;padding:20px;background:rgba(16,185,129,0.08);border-radius:var(--radius-md)">
+                  <div style="font-size:32px;font-weight:800;color:var(--success)">≈ 2h</div>
+                  <div class="text-xs text-muted mt-4">Tiempo estimado</div>
+                </div>
+                <div style="text-align:center;padding:20px;background:rgba(245,158,11,0.08);border-radius:var(--radius-md)">
+                  <div style="font-size:32px;font-weight:800;color:var(--gold-400)">Gratis</div>
+                  <div class="text-xs text-muted mt-4">Costo (tier gratuito)</div>
+                </div>
+              </div>
+
+              <div style="background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.2);border-radius:var(--radius-sm);padding:16px;margin-bottom:24px">
+                <p class="text-sm" style="color:var(--gold-400);font-weight:600">⚠️ Antes de enviar, verificá:</p>
+                <ul class="text-sm text-secondary mt-8" style="padding-left:20px;line-height:2">
+                  <li>Las credenciales de la API están configuradas correctamente</li>
+                  <li>La plantilla seleccionada está aprobada por Meta</li>
+                  <li>El número de teléfono de WhatsApp Business está activo</li>
+                  <li>Tenés suficientes conversaciones disponibles en tu plan</li>
+                </ul>
+              </div>
+
+              <div class="flex gap-12">
+                <button class="btn btn-ghost btn-lg" id="btn-wizard-back-2">← Volver</button>
+                <button class="btn btn-gold btn-lg" id="btn-wizard-send" style="flex:1">
+                  🚀 Lanzar Campaña
+                </button>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+        <!-- PASO 3 — Enviando -->
+        <div class="wizard-step-content" id="step-3" style="display:none">
+          <div class="card">
+            <div class="card-header">
+              <h2><i data-lucide="loader-2"></i> Enviando Campaña</h2>
+              <button class="btn btn-danger btn-sm" id="btn-stop-campaign">⏹️ Detener</button>
+            </div>
+            <div class="card-body">
+
+              <div style="text-align:center;margin-bottom:28px">
+                <div class="sending-ring"></div>
+                <div style="font-size:18px;font-weight:700" id="campaign-progress-name">—</div>
+                <div class="text-sm text-muted mt-4">Enviando mensajes WhatsApp…</div>
+              </div>
+
+              <div class="progress-track" style="height:14px;margin-bottom:12px">
+                <div class="progress-fill" id="campaign-progress-bar" style="width:0%"></div>
+              </div>
+              <div class="flex-between mb-24">
+                <span class="text-sm text-muted"><span id="campaign-progress-sent">0</span> / <span id="campaign-progress-total">0</span></span>
+                <span class="fw-700 text-lavanda" id="campaign-progress-pct">0%</span>
+              </div>
+
+              <div class="grid-3" style="gap:14px;margin-bottom:24px">
+                <div style="text-align:center;padding:14px;background:rgba(16,185,129,0.08);border-radius:var(--radius-sm)">
+                  <div style="font-size:24px;font-weight:800;color:var(--success)" id="campaign-progress-sent2">—</div>
+                  <div class="text-xs text-muted">Enviados</div>
+                </div>
+                <div style="text-align:center;padding:14px;background:rgba(239,68,68,0.08);border-radius:var(--radius-sm)">
+                  <div style="font-size:24px;font-weight:800;color:var(--danger)" id="campaign-progress-error">0</div>
+                  <div class="text-xs text-muted">Errores</div>
+                </div>
+                <div style="text-align:center;padding:14px;background:rgba(124,58,237,0.08);border-radius:var(--radius-sm)">
+                  <div style="font-size:24px;font-weight:800;color:var(--lavanda-400)">30/s</div>
+                  <div class="text-xs text-muted">Rate actual</div>
+                </div>
+              </div>
+
+              <!-- Log de envío -->
+              <div class="form-label mb-8">Log de envío en tiempo real</div>
+              <div class="log-terminal" id="send-log">
+                <div class="log-line info"><span class="log-ts">—</span>Sistema listo. Esperando inicio de campaña…</div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- ══════════════════════════════════════
+           VIEW: BASE DE DATOS
+      ══════════════════════════════════════ -->
+      <section class="view" id="view-database">
+
+        <!-- Stats bar -->
+        <div class="flex gap-8 flex-wrap" id="db-stats-bar"></div>
+
+        <!-- Filtros -->
+        <div class="card">
+          <div class="card-body">
+            <div style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:12px;align-items:center">
+
+              <div class="search-bar">
+                <i data-lucide="search" style="width:16px;height:16px;flex-shrink:0"></i>
+                <input type="text" id="db-search" placeholder="Buscar por nombre, teléfono o DNI…">
+              </div>
+
+              <select class="form-select" id="db-barrio">
+                <option value="">Todos los barrios</option>
+              </select>
+
+              <select class="form-select" id="db-status">
+                <option value="">Todos los estados</option>
+                <option value="active">Activos</option>
+                <option value="inactive">Inactivos</option>
+                <option value="blocked">Bloqueados</option>
+              </select>
+
+              <button class="btn btn-primary" onclick="window.importCSV && importCSV()">
+                <i data-lucide="upload" style="width:14px;height:14px"></i>
+                Importar CSV
+              </button>
+
+            </div>
+          </div>
+        </div>
+
+        <!-- Tabla -->
+        <div class="card">
+          <div class="card-header">
+            <h2><i data-lucide="table"></i> Contactos</h2>
+            <span class="text-sm text-muted" id="db-info"></span>
+          </div>
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th>Nombre</th>
+                  <th>Teléfono</th>
+                  <th>Barrio</th>
+                  <th>Categoría</th>
+                  <th>Estado</th>
+                  <th>Mensaje</th>
+                  <th>Último contacto</th>
+                </tr>
+              </thead>
+              <tbody id="contacts-tbody">
+                <tr><td colspan="7" style="text-align:center;padding:40px;color:var(--text-muted)">Cargando…</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div style="padding:16px;border-top:1px solid var(--bg-border)">
+            <div class="pagination" id="db-pagination"></div>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- ══════════════════════════════════════
+           VIEW: CAMPAÑAS
+      ══════════════════════════════════════ -->
+      <section class="view" id="view-campaigns">
+
+        <!-- Stats globales -->
+        <div class="metrics-grid">
+          <div class="metric-card">
+            <div class="metric-icon"><i data-lucide="megaphone"></i></div>
+            <div class="metric-value"><span id="camp-total">0</span></div>
+            <div class="metric-label">Total campañas</div>
+          </div>
+          <div class="metric-card success">
+            <div class="metric-icon"><i data-lucide="check-circle"></i></div>
+            <div class="metric-value"><span id="camp-completed">0</span></div>
+            <div class="metric-label">Completadas</div>
+          </div>
+          <div class="metric-card info">
+            <div class="metric-icon"><i data-lucide="loader"></i></div>
+            <div class="metric-value"><span id="camp-running">0</span></div>
+            <div class="metric-label">En progreso</div>
+          </div>
+          <div class="metric-card gold">
+            <div class="metric-icon"><i data-lucide="clock"></i></div>
+            <div class="metric-value"><span id="camp-scheduled">0</span></div>
+            <div class="metric-label">Programadas</div>
+          </div>
+        </div>
+
+        <!-- Lista de campañas -->
+        <div class="grid-auto" id="campaigns-list"></div>
+
+        <!-- Botón nueva campaña -->
+        <div style="text-align:center;padding:20px">
+          <button class="btn btn-gold btn-lg" onclick="navigateTo('send')">
+            <i data-lucide="plus-circle"></i>
+            Crear Nueva Campaña
+          </button>
+        </div>
+
+      </section>
+
+      <!-- ══════════════════════════════════════
+           VIEW: PLANTILLAS
+      ══════════════════════════════════════ -->
+      <section class="view" id="view-templates">
+
+        <div class="flex-between">
+          <div>
+            <h2 style="font-size:18px;font-weight:700">Plantillas de WhatsApp</h2>
+            <p class="text-sm text-muted mt-4">Solo se pueden usar plantillas aprobadas por Meta</p>
+          </div>
+          <div style="display:flex;gap:10px;align-items:center">
+            <span class="badge badge-success">✅ Aprobadas: 5</span>
+            <span class="badge badge-warning">⏳ En revisión: 1</span>
+          </div>
+        </div>
+
+        <div class="grid-auto" id="templates-grid"></div>
+
+      </section>
+
+      <!-- ══════════════════════════════════════
+           VIEW: REPORTES
+      ══════════════════════════════════════ -->
+      <section class="view" id="view-reports">
+
+        <!-- Métricas clave -->
+        <div class="metrics-grid">
+          <div class="metric-card">
+            <div class="metric-icon"><i data-lucide="send"></i></div>
+            <div class="metric-value"><span id="rep-total-sent">0</span></div>
+            <div class="metric-label">Total mensajes enviados</div>
+          </div>
+          <div class="metric-card success">
+            <div class="metric-icon"><i data-lucide="check-circle-2"></i></div>
+            <div class="metric-value"><span id="rep-delivery-rate">0</span>%</div>
+            <div class="metric-label">Tasa de entrega</div>
+          </div>
+          <div class="metric-card gold">
+            <div class="metric-icon"><i data-lucide="eye"></i></div>
+            <div class="metric-value"><span id="rep-read-rate">0</span>%</div>
+            <div class="metric-label">Tasa de lectura</div>
+          </div>
+          <div class="metric-card info">
+            <div class="metric-icon"><i data-lucide="database"></i></div>
+            <div class="metric-value"><span id="rep-total-db">0</span></div>
+            <div class="metric-label">Contactos en base</div>
+          </div>
+        </div>
+
+        <div class="grid-2">
+
+          <!-- Tasa de entrega donut -->
+          <div class="card">
+            <div class="card-header">
+              <h2><i data-lucide="pie-chart"></i> Tasa de Entrega</h2>
+            </div>
+            <div class="card-body" style="display:flex;align-items:center;justify-content:center;gap:32px;flex-wrap:wrap">
+              <div style="position:relative;width:160px;height:160px">
+                <canvas id="chart-delivery-rate" style="width:160px;height:160px"></canvas>
+                <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center">
+                  <div style="font-size:28px;font-weight:800;color:var(--lavanda-400)">97%</div>
+                  <div class="text-xs text-muted">Entrega</div>
+                </div>
+              </div>
+              <div class="flex-col gap-12">
+                <div class="flex gap-8 flex-center">
+                  <div style="width:12px;height:12px;border-radius:50%;background:var(--lavanda-500)"></div>
+                  <span class="text-sm">Entregados: <strong>97%</strong></span>
+                </div>
+                <div class="flex gap-8 flex-center">
+                  <div style="width:12px;height:12px;border-radius:50%;background:rgba(124,58,237,0.2)"></div>
+                  <span class="text-sm">Sin entrega: <strong>3%</strong></span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Tasa de lectura donut -->
+          <div class="card">
+            <div class="card-header">
+              <h2><i data-lucide="book-open"></i> Tasa de Lectura</h2>
+            </div>
+            <div class="card-body" style="display:flex;align-items:center;justify-content:center;gap:32px;flex-wrap:wrap">
+              <div style="position:relative;width:160px;height:160px">
+                <canvas id="chart-read-rate" style="width:160px;height:160px"></canvas>
+                <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center">
+                  <div style="font-size:28px;font-weight:800;color:var(--gold-400)">77%</div>
+                  <div class="text-xs text-muted">Lectura</div>
+                </div>
+              </div>
+              <div class="flex-col gap-12">
+                <div class="flex gap-8 flex-center">
+                  <div style="width:12px;height:12px;border-radius:50%;background:var(--gold-500)"></div>
+                  <span class="text-sm">Leídos: <strong>77%</strong></span>
+                </div>
+                <div class="flex gap-8 flex-center">
+                  <div style="width:12px;height:12px;border-radius:50%;background:rgba(245,158,11,0.2)"></div>
+                  <span class="text-sm">Sin leer: <strong>23%</strong></span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Gráfico semanal -->
+        <div class="card">
+          <div class="card-header">
+            <h2><i data-lucide="trending-up"></i> Evolución Semanal</h2>
+            <div class="flex gap-8">
+              <span class="badge badge-lavanda">■ Enviados</span>
+              <span class="badge badge-warning">■ Leídos</span>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="chart-container" style="height:280px">
+              <canvas id="chart-weekly"></canvas>
+            </div>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- ══════════════════════════════════════
+           VIEW: CONFIGURACIÓN
+      ══════════════════════════════════════ -->
+      <section class="view" id="view-config">
+
+        <!-- Banner de instrucciones -->
+        <div style="background:linear-gradient(135deg,rgba(124,58,237,0.15),rgba(245,158,11,0.08));border:1px solid rgba(124,58,237,0.3);border-radius:var(--radius-lg);padding:24px">
+          <h3 style="font-size:16px;font-weight:700;margin-bottom:8px">🔑 Cómo obtener tus credenciales de Meta</h3>
+          <ol class="text-sm text-secondary" style="padding-left:20px;line-height:2.2">
+            <li>Ingresá a <strong style="color:var(--lavanda-400)">developers.facebook.com</strong> → Tu App → WhatsApp → API Setup</li>
+            <li>Copiá el <strong>Phone Number ID</strong> y el <strong>Temporary Access Token</strong> (o generá uno permanente)</li>
+            <li>El <strong>WABA ID</strong> está en la sección "WhatsApp Business Account"</li>
+            <li>El <strong>Webhook Verify Token</strong> es el string que pusiste al configurar el webhook</li>
+            <li>Pegá todos los datos abajo y presioná "Probar Conexión"</li>
+          </ol>
+        </div>
+
+        <!-- Credenciales de la API -->
+        <div class="config-section">
+          <div class="config-section-header">
+            <i data-lucide="key"></i>
+            Credenciales de WhatsApp Business API
+          </div>
+          <div class="config-section-body">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+
+              <div class="form-group">
+                <label class="form-label" for="cfg-phoneNumberId">Phone Number ID</label>
+                <div class="credential-field">
+                  <input class="form-input" id="cfg-phoneNumberId" type="password"
+                    placeholder="Ej: 123456789012345" autocomplete="off">
+                  <button class="reveal-btn" onclick="toggleReveal('cfg-phoneNumberId')" title="Mostrar/ocultar">👁️</button>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="cfg-appId">App ID</label>
+                <div class="credential-field">
+                  <input class="form-input" id="cfg-appId" type="password"
+                    placeholder="Ej: 987654321098765" autocomplete="off">
+                  <button class="reveal-btn" onclick="toggleReveal('cfg-appId')" title="Mostrar/ocultar">👁️</button>
+                </div>
+              </div>
+
+              <div class="form-group" style="grid-column:1/-1">
+                <label class="form-label" for="cfg-accessToken">Access Token (Permanente)</label>
+                <div class="credential-field">
+                  <input class="form-input" id="cfg-accessToken" type="password"
+                    placeholder="EAAxxxxxxxxxxxxxxxx..." autocomplete="off">
+                  <button class="reveal-btn" onclick="toggleReveal('cfg-accessToken')" title="Mostrar/ocultar">👁️</button>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="cfg-wabaId">WhatsApp Business Account ID</label>
+                <div class="credential-field">
+                  <input class="form-input" id="cfg-wabaId" type="password"
+                    placeholder="Ej: 111222333444555" autocomplete="off">
+                  <button class="reveal-btn" onclick="toggleReveal('cfg-wabaId')" title="Mostrar/ocultar">👁️</button>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="cfg-webhookToken">Webhook Verify Token</label>
+                <div class="credential-field">
+                  <input class="form-input" id="cfg-webhookToken" type="password"
+                    placeholder="Tu string secreto del webhook" autocomplete="off">
+                  <button class="reveal-btn" onclick="toggleReveal('cfg-webhookToken')" title="Mostrar/ocultar">👁️</button>
+                </div>
+              </div>
+
+            </div>
+
+            <hr class="divider">
+
+            <div class="flex gap-12">
+              <button class="btn btn-primary" id="btn-save-config">
+                <i data-lucide="save"></i>
+                Guardar Credenciales
+              </button>
+              <button class="btn btn-ghost" id="btn-test-connection">
+                🔌 Probar Conexión
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Webhook Info -->
+        <div class="config-section">
+          <div class="config-section-header">
+            <i data-lucide="webhook"></i>
+            Configuración del Webhook
+          </div>
+          <div class="config-section-body">
+            <div style="background:rgba(15,15,30,0.8);border:1px solid var(--glass-border);border-radius:var(--radius-sm);padding:16px;font-family:'Courier New',monospace;font-size:13px;color:var(--text-secondary);line-height:2">
+              <div><span style="color:var(--lavanda-400)">URL de Callback:</span> https://TU_SERVIDOR/webhook</div>
+              <div><span style="color:var(--lavanda-400)">Verify Token:</span> [el que configuraste arriba]</div>
+              <div><span style="color:var(--lavanda-400)">Eventos a suscribir:</span> messages, message_deliveries, message_reads</div>
+            </div>
+            <p class="text-sm text-muted mt-12">
+              ⚠️ El webhook necesita una URL HTTPS pública. Para pruebas locales usá <strong style="color:var(--lavanda-400)">ngrok</strong>.
+              Encontrás el servidor webhook listo para copiar en el archivo <strong>webhook-server.md</strong>.
+            </p>
+          </div>
+        </div>
+
+        <!-- Log de la API -->
+        <div class="config-section">
+          <div class="config-section-header">
+            <i data-lucide="terminal"></i>
+            Log de Conexión
+          </div>
+          <div class="config-section-body">
+            <div class="log-terminal" id="config-log">
+              <div class="log-line info"><span class="log-ts">—</span>Sistema iniciado. Ingresá las credenciales y presioná "Probar Conexión".</div>
+            </div>
+          </div>
+        </div>
+
+      </section>
+
+    </div><!-- /page-content -->
+  </main>
+
+</div><!-- /app-wrapper -->
+
+<!-- ══════════════════════════════════════════════
+     MODAL — TEMPLATE PREVIEW
+══════════════════════════════════════════════ -->
+<div class="modal-overlay" id="modal-template" onclick="if(event.target===this)closeModal('modal-template')">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 class="modal-title" id="modal-tpl-title">Plantilla</h3>
+      <button class="modal-close" onclick="closeModal('modal-template')">✕</button>
+    </div>
+    <div class="template-preview" style="border-radius:var(--radius-md);margin-bottom:20px">
+      <div class="template-bubble" id="modal-tpl-body"></div>
+    </div>
+    <div class="flex gap-8 justify-end">
+      <button class="btn btn-ghost" onclick="closeModal('modal-template')">Cerrar</button>
+      <button class="btn btn-primary" onclick="closeModal('modal-template');navigateTo('send')">📨 Usar esta plantilla</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════
+     TOAST CONTAINER
+══════════════════════════════════════════════ -->
+<div class="toast-container" id="toast-container"></div>
+
+<!-- ── SCRIPTS ──────────────────────────────── -->
+<script>
+  // Inicializar iconos Lucide
+  window.addEventListener('DOMContentLoaded', () => {
+    if (window.lucide) lucide.createIcons();
+  });
+
+  // Re-renderizar iconos tras navegación
+  const _origCreateIcons = () => { if (window.lucide) window.lucide.createIcons(); };
+  document.addEventListener('view-changed', _origCreateIcons);
+
+  // Hacer navigateTo global para inline handlers
+  window.navigateTo = null; // se asigna desde app.js
+</script>
+
+<script type="module" src="app.js"></script>
+
+<script>
+  // Patch para acceder a navigateTo desde inline handlers tras carga del módulo
+  window.addEventListener('load', () => {
+    // Patch: los botones de navegación inline necesitan acceso a navigateTo
+    // app.js exporta navigateTo implícitamente vía DOMContentLoaded
+    // Los inline onclick de templates/campaigns usan window.navigateTo
+    // app.js hace: window.navigateTo = navigateTo al final del DOMContentLoaded
+  });
+</script>
+
+</body>
+</html>
