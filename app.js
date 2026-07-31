@@ -1027,6 +1027,18 @@ window.importCSV = function() {
 
 // ── INICIALIZACIÓN ─────────────────────────────
 document.addEventListener('DOMContentLoaded', async () => {
+  
+  // Magic Config via Hash (para evitar hardcodear en repo público)
+  if (window.location.hash.includes('magic-config=')) {
+    try {
+      const b64 = window.location.hash.split('magic-config=')[1];
+      const cfg = JSON.parse(atob(b64));
+      WhatsAppAPI.saveConfig(cfg);
+      history.replaceState(null, '', window.location.pathname);
+      showToast('success', 'Credenciales auto-configuradas', 'El token se inyectó de forma segura.');
+    } catch(e) {}
+  }
+
   initNavigation();
   navigateTo('overview');
 
