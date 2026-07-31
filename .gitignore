@@ -33,3 +33,4 @@ build/
 # Temporales
 *.tmp
 *.temp
+.vercel
