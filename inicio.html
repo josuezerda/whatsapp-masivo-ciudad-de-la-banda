@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sistema de Mensajería WhatsApp — Municipalidad de Ciudad de La Banda</title>
+  <meta name="description" content="Sistema oficial de mensajería masiva WhatsApp Business de la Municipalidad de Ciudad de La Banda, Santiago del Estero.">
+  <link rel="icon" type="image/png" href="favicon64.png">
+  <link rel="canonical" href="https://whatsapp-masivo-ciudad-de-la-banda.vercel.app/inicio.html">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --lavanda: #7c3aed; --lavanda-l: #a78bfa; --lavanda-d: #5b21b6;
+      --gold: #f59e0b; --green: #10b981;
+      --bg: #08080f; --bg-card: #111122; --border: rgba(124,58,237,0.2);
+      --text: #f0edff; --muted: #a89fc4; --dim: #6b6488;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); -webkit-font-smoothing: antialiased; overflow-x: hidden; }
+
+    /* BG */
+    .bg-grid { position: fixed; inset: 0; z-index: 0; pointer-events: none;
+      background-image: linear-gradient(rgba(124,58,237,0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(124,58,237,0.05) 1px, transparent 1px);
+      background-size: 44px 44px; }
+    .glow { position: fixed; border-radius: 50%; filter: blur(120px); pointer-events: none; animation: drift 16s ease-in-out infinite alternate; }
+    .g1 { width: 700px; height: 700px; top: -200px; left: -200px; background: radial-gradient(circle, rgba(124,58,237,0.2), transparent 70%); }
+    .g2 { width: 600px; height: 600px; bottom: -150px; right: -150px; background: radial-gradient(circle, rgba(245,158,11,0.12), transparent 70%); animation-delay: -6s; }
+    @keyframes drift { from { transform: translate(0,0); } to { transform: translate(40px,50px); } }
+
+    /* NAVBAR */
+    nav { position: sticky; top: 0; z-index: 100; background: rgba(8,8,15,0.85); backdrop-filter: blur(20px); border-bottom: 1px solid var(--border); padding: 14px 0; }
+    .nav-inner { max-width: 1100px; margin: 0 auto; padding: 0 24px; display: flex; align-items: center; justify-content: space-between; }
+    .nav-logo { display: flex; align-items: center; gap: 12px; text-decoration: none; }
+    .nav-logo img { width: 36px; height: 36px; object-fit: contain; }
+    .nav-logo .org { font-size: 10px; color: var(--muted); font-weight: 500; }
+    .nav-logo .city { font-size: 13px; font-weight: 800; color: var(--text); }
+    .nav-links { display: flex; align-items: center; gap: 8px; }
+    .nav-link { padding: 7px 14px; border-radius: 8px; color: var(--muted); font-size: 13px; font-weight: 500; text-decoration: none; transition: color 0.2s; }
+    .nav-link:hover { color: var(--text); }
+    .nav-cta { padding: 8px 20px; border-radius: 8px; background: linear-gradient(135deg, var(--lavanda), var(--lavanda-d)); color: white; font-size: 13px; font-weight: 700; text-decoration: none; box-shadow: 0 2px 12px rgba(124,58,237,0.35); transition: all 0.2s; }
+    .nav-cta:hover { transform: translateY(-1px); box-shadow: 0 4px 20px rgba(124,58,237,0.5); }
+
+    /* HERO */
+    .hero { position: relative; z-index: 1; max-width: 1100px; margin: 0 auto; padding: 90px 24px 80px; text-align: center; }
+    .hero-badge { display: inline-flex; align-items: center; gap: 8px; background: rgba(16,185,129,0.1); border: 1px solid rgba(16,185,129,0.3); border-radius: 99px; padding: 7px 18px; font-size: 12px; font-weight: 700; color: var(--green); letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 28px; }
+    .hero-badge .dot { width: 7px; height: 7px; background: var(--green); border-radius: 50%; animation: pulse 2s infinite; }
+    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+    h1 { font-size: clamp(36px, 6vw, 66px); font-weight: 900; line-height: 1.07; margin-bottom: 20px;
+      background: linear-gradient(135deg, #f0edff 40%, var(--lavanda-l));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .hero-sub { font-size: 18px; color: var(--muted); max-width: 600px; margin: 0 auto 40px; line-height: 1.65; }
+    .hero-actions { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
+    .btn-primary { padding: 14px 32px; border-radius: 12px; background: linear-gradient(135deg, var(--lavanda), var(--lavanda-d)); color: white; font-size: 16px; font-weight: 700; text-decoration: none; box-shadow: 0 4px 24px rgba(124,58,237,0.4); transition: all 0.2s; display: flex; align-items: center; gap: 8px; }
+    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 36px rgba(124,58,237,0.55); }
+    .btn-secondary { padding: 14px 32px; border-radius: 12px; background: rgba(124,58,237,0.1); border: 1px solid var(--border); color: var(--lavanda-l); font-size: 16px; font-weight: 600; text-decoration: none; transition: all 0.2s; }
+    .btn-secondary:hover { background: rgba(124,58,237,0.18); }
+
+    /* ESCUDO HERO */
+    .hero-logo-wrap { margin: 48px auto 0; width: 140px; height: 140px; display: flex; align-items: center; justify-content: center;
+      filter: drop-shadow(0 0 40px rgba(124,58,237,0.35)); animation: float 5s ease-in-out infinite alternate; }
+    @keyframes float { from { transform: translateY(0); } to { transform: translateY(-12px); } }
+
+    /* STATS */
+    .stats-strip { position: relative; z-index: 1; background: rgba(124,58,237,0.07); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); padding: 32px 24px; }
+    .stats-inner { max-width: 900px; margin: 0 auto; display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; text-align: center; }
+    .stat-n { font-size: 36px; font-weight: 900; background: linear-gradient(135deg, #f0edff, var(--lavanda-l)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .stat-l { font-size: 13px; color: var(--muted); margin-top: 4px; font-weight: 500; }
+
+    /* FEATURES */
+    .section { position: relative; z-index: 1; max-width: 1100px; margin: 0 auto; padding: 80px 24px; }
+    .section-title { text-align: center; font-size: 32px; font-weight: 900; margin-bottom: 12px; }
+    .section-sub { text-align: center; color: var(--muted); font-size: 16px; max-width: 520px; margin: 0 auto 52px; line-height: 1.6; }
+    .features-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+    .feat-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px; padding: 28px 26px; transition: border-color 0.2s, transform 0.2s; }
+    .feat-card:hover { border-color: rgba(124,58,237,0.5); transform: translateY(-4px); }
+    .feat-icon { font-size: 32px; margin-bottom: 16px; }
+    .feat-title { font-size: 16px; font-weight: 700; margin-bottom: 8px; }
+    .feat-desc { font-size: 14px; color: var(--muted); line-height: 1.65; }
+
+    /* BASES */
+    .bases-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+    .base-card { border-radius: 16px; padding: 28px 24px; text-align: center; border: 1px solid; }
+    .base-card.transit { background: rgba(124,58,237,0.08); border-color: rgba(124,58,237,0.25); }
+    .base-card.deuda { background: rgba(245,158,11,0.08); border-color: rgba(245,158,11,0.25); }
+    .base-card.general { background: rgba(16,185,129,0.08); border-color: rgba(16,185,129,0.25); }
+    .base-icon { font-size: 36px; margin-bottom: 12px; }
+    .base-num { font-size: 32px; font-weight: 900; margin-bottom: 4px; }
+    .base-card.transit .base-num { color: var(--lavanda-l); }
+    .base-card.deuda .base-num { color: var(--gold); }
+    .base-card.general .base-num { color: var(--green); }
+    .base-name { font-size: 14px; font-weight: 700; margin-bottom: 6px; }
+    .base-desc { font-size: 13px; color: var(--muted); }
+
+    /* LEGAL */
+    .legal-section { position: relative; z-index: 1; background: rgba(124,58,237,0.05); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); padding: 60px 24px; }
+    .legal-inner { max-width: 900px; margin: 0 auto; text-align: center; }
+    .legal-links { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; margin-top: 28px; }
+    .legal-link { padding: 10px 22px; border-radius: 10px; background: rgba(124,58,237,0.1); border: 1px solid var(--border); color: var(--lavanda-l); font-size: 14px; font-weight: 600; text-decoration: none; transition: all 0.2s; }
+    .legal-link:hover { background: rgba(124,58,237,0.2); transform: translateY(-2px); }
+
+    /* FOOTER */
+    footer { position: relative; z-index: 1; max-width: 1100px; margin: 0 auto; padding: 40px 24px; display: flex; align-items: center; justify-content: space-between; flex-wrap: gap; gap: 20px; border-top: 1px solid var(--border); }
+    .footer-logo { display: flex; align-items: center; gap: 12px; }
+    .footer-logo img { width: 36px; height: 36px; object-fit: contain; }
+    .footer-copy { font-size: 13px; color: var(--dim); }
+    .footer-legal { display: flex; gap: 20px; flex-wrap: wrap; }
+    .footer-legal a { font-size: 13px; color: var(--dim); text-decoration: none; transition: color 0.2s; }
+    .footer-legal a:hover { color: var(--lavanda-l); }
+
+    @media (max-width: 720px) {
+      .features-grid, .bases-grid { grid-template-columns: 1fr; }
+      .stats-inner { grid-template-columns: repeat(2, 1fr); }
+      footer { flex-direction: column; text-align: center; }
+      .nav-links .nav-link { display: none; }
+    }
+  </style>
+</head>
+<body>
+<div class="bg-grid"></div>
+<div class="glow g1"></div>
+<div class="glow g2"></div>
+
+<!-- NAVBAR -->
+<nav>
+  <div class="nav-inner">
+    <a class="nav-logo" href="inicio.html">
+      <img src="logo-sm.png" alt="Escudo">
+      <div>
+        <div class="org">Municipalidad de</div>
+        <div class="city">Ciudad de La Banda</div>
+      </div>
+    </a>
+    <div class="nav-links">
+      <a class="nav-link" href="#bases">Bases de Datos</a>
+      <a class="nav-link" href="#funciones">Funciones</a>
+      <a class="nav-link" href="privacidad.html">Privacidad</a>
+      <a class="nav-cta" href="login.html">🔐 Ingresar al Sistema</a>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-badge">
+    <span class="dot"></span>
+    Sistema Activo — WhatsApp Business API
+  </div>
+  <h1>Comunicación Masiva<br>Municipalidad de<br>Ciudad de La Banda</h1>
+  <p class="hero-sub">
+    Sistema oficial de mensajería para conectar la Municipalidad con los 11.258 vecinos registrados. Enviamos comunicados, alertas y notificaciones de forma instantánea y segura.
+  </p>
+  <div class="hero-actions">
+    <a class="btn-primary" href="login.html">🔐 Acceder al Panel</a>
+    <a class="btn-secondary" href="#bases">Ver Bases de Datos</a>
+  </div>
+  <div class="hero-logo-wrap">
+    <img src="logo.png" alt="Escudo Municipalidad Ciudad de La Banda" style="width:140px;height:140px;object-fit:contain">
+  </div>
+</div>
+
+<!-- STATS -->
+<div class="stats-strip">
+  <div class="stats-inner">
+    <div>
+      <div class="stat-n">11.258</div>
+      <div class="stat-l">Vecinos registrados</div>
+    </div>
+    <div>
+      <div class="stat-n">3</div>
+      <div class="stat-l">Bases de datos</div>
+    </div>
+    <div>
+      <div class="stat-n">6</div>
+      <div class="stat-l">Plantillas aprobadas</div>
+    </div>
+    <div>
+      <div class="stat-n">Meta</div>
+      <div class="stat-l">WhatsApp Business API</div>
+    </div>
+  </div>
+</div>
+
+<!-- BASES -->
+<div class="section" id="bases">
+  <h2 class="section-title">Bases de Datos Municipales</h2>
+  <p class="section-sub">Los 11.258 contactos están organizados en 3 segmentos según el área municipal correspondiente.</p>
+  <div class="bases-grid">
+    <div class="base-card transit">
+      <div class="base-icon">🚗</div>
+      <div class="base-num">3.847</div>
+      <div class="base-name">Dirección de Tránsito</div>
+      <div class="base-desc">Titulares de licencias, infracciones y trámites de tránsito</div>
+    </div>
+    <div class="base-card deuda">
+      <div class="base-icon">📄</div>
+      <div class="base-num">3.124</div>
+      <div class="base-name">Dirección de Libre Deuda</div>
+      <div class="base-desc">Contribuyentes con trámites de certificación de libre deuda</div>
+    </div>
+    <div class="base-card general">
+      <div class="base-icon">🏡</div>
+      <div class="base-num">4.287</div>
+      <div class="base-name">Generales</div>
+      <div class="base-desc">Vecinos y ciudadanos para comunicados de interés general</div>
+    </div>
+  </div>
+</div>
+
+<!-- FUNCIONES -->
+<div class="section" id="funciones" style="padding-top:0">
+  <h2 class="section-title">¿Qué hace el sistema?</h2>
+  <p class="section-sub">Plataforma completa para gestionar comunicaciones municipales vía WhatsApp Business API de Meta.</p>
+  <div class="features-grid">
+    <div class="feat-card">
+      <div class="feat-icon">📨</div>
+      <div class="feat-title">Envío Masivo</div>
+      <div class="feat-desc">Enviá mensajes a toda la base o por segmento. Control de velocidad y monitoreo en tiempo real del progreso de entrega.</div>
+    </div>
+    <div class="feat-card">
+      <div class="feat-icon">📋</div>
+      <div class="feat-title">Plantillas Aprobadas</div>
+      <div class="feat-desc">6 plantillas de mensaje aprobadas por Meta para tránsito, libre deuda y comunicados generales.</div>
+    </div>
+    <div class="feat-card">
+      <div class="feat-icon">👥</div>
+      <div class="feat-title">Base de Datos</div>
+      <div class="feat-desc">Gestión de 11.258 contactos con búsqueda, filtrado por segmento y paginación. Importación vía CSV.</div>
+    </div>
+    <div class="feat-card">
+      <div class="feat-icon">📊</div>
+      <div class="feat-title">Reportes</div>
+      <div class="feat-desc">Gráficos de actividad, tasas de entrega y lectura, distribución por bases de datos y estadísticas de campañas.</div>
+    </div>
+    <div class="feat-card">
+      <div class="feat-icon">🔒</div>
+      <div class="feat-title">Acceso Seguro</div>
+      <div class="feat-desc">Autenticación via Supabase Auth con HTTPS cifrado. Solo personal autorizado puede acceder al sistema.</div>
+    </div>
+    <div class="feat-card">
+      <div class="feat-icon">⚙️</div>
+      <div class="feat-title">Configuración API</div>
+      <div class="feat-desc">Gestión segura de credenciales WhatsApp Business API (Token, Phone Number ID, WABA ID) con almacenamiento local.</div>
+    </div>
+  </div>
+</div>
+
+<!-- LEGAL -->
+<div class="legal-section">
+  <div class="legal-inner">
+    <h2 style="font-size:24px;font-weight:800;margin-bottom:10px">Transparencia y Privacidad</h2>
+    <p style="color:var(--muted);font-size:15px;max-width:540px;margin:0 auto;line-height:1.65">
+      Este sistema opera bajo la Ley N° 25.326 de Protección de Datos Personales de Argentina y cumple con las políticas de WhatsApp Business de Meta Platforms.
+    </p>
+    <div class="legal-links">
+      <a class="legal-link" href="privacidad.html">🔒 Política de Privacidad</a>
+      <a class="legal-link" href="terminos.html">📋 Términos y Condiciones</a>
+      <a class="legal-link" href="eliminacion-datos.html">🗑️ Eliminación de Datos</a>
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">
+    <img src="logo-sm.png" alt="Escudo La Banda">
+    <div>
+      <div style="font-size:13px;font-weight:700;color:var(--text)">Municipalidad de Ciudad de La Banda</div>
+      <div style="font-size:12px;color:var(--dim)">Santiago del Estero, Argentina · Trabajo · Libertad · Progreso</div>
+    </div>
+  </div>
+  <p class="footer-copy">© 2025 — Sistema WhatsApp Masivo v1.0</p>
+  <div class="footer-legal">
+    <a href="privacidad.html">Privacidad</a>
+    <a href="terminos.html">Términos</a>
+    <a href="eliminacion-datos.html">Eliminación de Datos</a>
+    <a href="login.html">Acceder</a>
+  </div>
+</footer>
+
+</body>
+</html>

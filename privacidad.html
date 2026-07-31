@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Política de Privacidad — Municipalidad de Ciudad de La Banda</title>
+  <meta name="description" content="Política de Privacidad del sistema de mensajería WhatsApp de la Municipalidad de Ciudad de La Banda.">
+  <link rel="icon" type="image/png" href="favicon64.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --lavanda: #7c3aed;
+      --lavanda-light: #a78bfa;
+      --gold: #f59e0b;
+      --bg: #08080f;
+      --bg-card: #111122;
+      --border: rgba(124,58,237,0.2);
+      --text: #f0edff;
+      --muted: #a89fc4;
+      --dim: #6b6488;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.8;
+      -webkit-font-smoothing: antialiased;
+    }
+    .bg-grid {
+      position: fixed; inset: 0; z-index: 0; pointer-events: none;
+      background-image:
+        linear-gradient(rgba(124,58,237,0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(124,58,237,0.04) 1px, transparent 1px);
+      background-size: 40px 40px;
+    }
+    .glow { position: fixed; border-radius: 50%; filter: blur(100px); pointer-events: none; }
+    .g1 { width: 500px; height: 500px; top: -150px; left: -150px; background: radial-gradient(circle, rgba(124,58,237,0.14), transparent 70%); }
+    .g2 { width: 400px; height: 400px; bottom: -100px; right: -100px; background: radial-gradient(circle, rgba(245,158,11,0.08), transparent 70%); }
+
+    header {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(8,8,15,0.85); backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+      padding: 16px 0;
+    }
+    .header-inner {
+      max-width: 860px; margin: 0 auto; padding: 0 24px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .logo-wrap { display: flex; align-items: center; gap: 14px; text-decoration: none; }
+    .logo-wrap img { width: 40px; height: 40px; object-fit: contain; }
+    .logo-text .org { font-size: 11px; color: var(--muted); font-weight: 500; }
+    .logo-text .city { font-size: 14px; font-weight: 800; color: var(--text); }
+    .back-btn {
+      padding: 8px 18px; border-radius: 8px;
+      background: rgba(124,58,237,0.12); border: 1px solid var(--border);
+      color: var(--lavanda-light); font-size: 13px; font-weight: 600;
+      text-decoration: none; transition: all 0.2s;
+    }
+    .back-btn:hover { background: rgba(124,58,237,0.22); }
+
+    main { position: relative; z-index: 1; max-width: 860px; margin: 0 auto; padding: 56px 24px 80px; }
+
+    .page-badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: rgba(124,58,237,0.12); border: 1px solid var(--border);
+      border-radius: 99px; padding: 6px 16px;
+      font-size: 12px; font-weight: 600; color: var(--lavanda-light);
+      letter-spacing: 0.06em; text-transform: uppercase;
+      margin-bottom: 20px;
+    }
+    h1 { font-size: 38px; font-weight: 900; line-height: 1.15; margin-bottom: 12px;
+      background: linear-gradient(135deg, #f0edff, var(--lavanda-light));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    }
+    .meta-info { font-size: 13px; color: var(--dim); margin-bottom: 48px; }
+    .meta-info strong { color: var(--muted); }
+
+    .card {
+      background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: 16px; padding: 36px 40px; margin-bottom: 24px;
+    }
+    h2 {
+      font-size: 18px; font-weight: 700; color: var(--text);
+      margin-bottom: 16px; display: flex; align-items: center; gap: 10px;
+      padding-bottom: 12px; border-bottom: 1px solid var(--border);
+    }
+    h2 .num {
+      width: 28px; height: 28px; border-radius: 8px;
+      background: rgba(124,58,237,0.2); color: var(--lavanda-light);
+      font-size: 13px; font-weight: 800; display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    p { font-size: 15px; color: var(--muted); margin-bottom: 14px; }
+    ul { padding-left: 20px; margin-bottom: 14px; }
+    ul li { font-size: 15px; color: var(--muted); margin-bottom: 8px; }
+    strong { color: var(--text); font-weight: 600; }
+    a { color: var(--lavanda-light); }
+
+    .highlight {
+      background: rgba(124,58,237,0.08); border: 1px solid rgba(124,58,237,0.2);
+      border-radius: 10px; padding: 16px 20px; margin: 16px 0;
+      font-size: 14px; color: var(--muted);
+    }
+    .highlight strong { color: var(--lavanda-light); }
+
+    footer {
+      text-align: center; padding: 32px 24px;
+      border-top: 1px solid var(--border);
+      font-size: 13px; color: var(--dim);
+      position: relative; z-index: 1;
+    }
+  </style>
+</head>
+<body>
+<div class="bg-grid"></div>
+<div class="glow g1"></div>
+<div class="glow g2"></div>
+
+<header>
+  <div class="header-inner">
+    <a class="logo-wrap" href="inicio.html">
+      <img src="logo-sm.png" alt="Escudo La Banda">
+      <div class="logo-text">
+        <div class="org">Municipalidad de</div>
+        <div class="city">Ciudad de La Banda</div>
+      </div>
+    </a>
+    <a class="back-btn" href="inicio.html">← Inicio</a>
+  </div>
+</header>
+
+<main>
+  <div class="page-badge">🔒 Legal</div>
+  <h1>Política de Privacidad</h1>
+  <p class="meta-info"><strong>Última actualización:</strong> 31 de julio de 2025 &nbsp;·&nbsp; <strong>Vigencia:</strong> desde la publicación</p>
+
+  <div class="card">
+    <h2><span class="num">1</span>Responsable del Tratamiento</h2>
+    <p>La <strong>Municipalidad de Ciudad de La Banda</strong> (en adelante, "la Municipalidad"), con domicilio en Av. Belgrano 450, Ciudad de La Banda, Santiago del Estero, Argentina, es la responsable del tratamiento de los datos personales recopilados a través del sistema de mensajería masiva WhatsApp Business.</p>
+    <p>Contacto: <a href="mailto:ochoalucinaciones@gmail.com">ochoalucinaciones@gmail.com</a></p>
+  </div>
+
+  <div class="card">
+    <h2><span class="num">2</span>Datos que Recopilamos</h2>
+    <p>En el marco del sistema de comunicación ciudadana, recopilamos y procesamos los siguientes datos personales:</p>
+    <ul>
+      <li><strong>Nombre y apellido</strong> del vecino/a</li>
+      <li><strong>Número de teléfono celular</strong> (formato WhatsApp)</li>
+      <li><strong>DNI</strong> (número de documento nacional de identidad)</li>
+      <li><strong>Área de interés municipal</strong> (Tránsito, Libre Deuda, Generales)</li>
+      <li><strong>Estado de entrega</strong> de los mensajes enviados</li>
+    </ul>
+    <div class="highlight"><strong>Nota:</strong> No recopilamos datos sensibles como información de salud, creencias religiosas, orientación política ni datos biométricos.</div>
+  </div>
+
+  <div class="card">
+    <h2><span class="num">3</span>Finalidad del Tratamiento</h2>
+    <p>Los datos personales son utilizados exclusivamente para:</p>
+    <ul>
+      <li>Enviar <strong>comunicaciones oficiales</strong> de la Municipalidad de Ciudad de La Banda</li>
+      <li>Informar sobre <strong>vencimientos, trámites y servicios municipales</strong></li>
+      <li>Notificar sobre <strong>cortes de servicio, eventos y avisos de interés público</strong></li>
+      <li>Gestionar el <strong>estado de entregas</strong> de los mensajes enviados vía WhatsApp Business API</li>
+    </ul>
+    <p>Los datos <strong>no son utilizados</strong> con fines comerciales ni son cedidos a terceros ajenos a la gestión municipal.</p>
+  </div>
+
+  <div class="card">
+    <h2><span class="num">4</span>Base Legal</h2>
+    <p>El tratamiento de los datos se realiza bajo las siguientes bases legales:</p>
+    <ul>
+      <li><strong>Ley N° 25.326</strong> de Protección de los Datos Personales (Argentina)</li>
+      <li><strong>Consentimiento</strong> del titular al inscribirse en los registros municipales</li>
+      <li><strong>Interés legítimo</strong> en la comunicación institucional con los vecinos</li>
+      <li><strong>Obligación legal</strong> de informar a los ciudadanos sobre actos de gobierno</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h2><span class="num">5</span>Plataforma de Mensajería (Meta / WhatsApp)</h2>
+    <p>Los mensajes son enviados a través de la <strong>WhatsApp Business API</strong>, operada por <strong>Meta Platforms Ireland Limited</strong>. Al enviar comunicaciones, los datos de contacto (número de teléfono) son procesados por Meta de acuerdo con sus propias políticas de privacidad.</p>
+    <p>Los mensajes enviados son <strong>plantillas aprobadas por Meta</strong>, lo que garantiza que el contenido es de naturaleza informativa y no publicitaria.</p>
+    <p>Política de privacidad de Meta: <a href="https://www.facebook.com/privacy/policy/" target="_blank" rel="noopener">facebook.com/privacy/policy</a></p>
+  </div>
+
+  <div class="card">
+    <h2><span class="num">6</span>Conservación de los Datos</h2>
+    <p>Los datos personales son conservados durante el tiempo necesario para cumplir con las finalidades descritas y mientras el vecino/a mantenga su vinculación activa con los servicios municipales.</p>
+    <p>Los registros de envío de mensajes son conservados por un período máximo de <strong>24 meses</strong> a efectos de auditoría interna.</p>
+  </div>
+
+  <div class="card">
+    <h2><span class="num">7</span>Derechos del Titular</h2>
+    <p>De conformidad con la Ley N° 25.326, el titular de los datos tiene derecho a:</p>
+    <ul>
+      <li><strong>Acceder</strong> a sus datos personales</li>
+      <li><strong>Rectificar</strong> datos incorrectos o desactualizados</li>
+      <li><strong>Eliminar</strong> sus datos de nuestra base (ver <a href="eliminacion-datos.html">instrucciones de eliminación</a>)</li>
+      <li><strong>Oponerse</strong> al tratamiento de sus datos</li>
+      <li><strong>Portabilidad</strong> de sus datos en formato estructurado</li>
+    </ul>
+    <p>Para ejercer estos derechos, enviar un correo a <a href="mailto:ochoalucinaciones@gmail.com">ochoalucinaciones@gmail.com</a> con el asunto <strong>"Derechos ARCO"</strong>.</p>
+  </div>
+
+  <div class="card">
+    <h2><span class="num">8</span>Seguridad</h2>
+    <p>La Municipalidad implementa medidas técnicas y organizativas adecuadas para proteger los datos personales frente a acceso no autorizado, pérdida o alteración. El sistema utiliza autenticación segura (Supabase Auth) y comunicación cifrada (HTTPS/TLS).</p>
+  </div>
+
+  <div class="card">
+    <h2><span class="num">9</span>Modificaciones</h2>
+    <p>La Municipalidad se reserva el derecho de modificar esta política de privacidad. Los cambios serán publicados en esta página con la fecha de actualización correspondiente.</p>
+  </div>
+</main>
+
+<footer>
+  <p>© 2025 Municipalidad de Ciudad de La Banda — Santiago del Estero, Argentina</p>
+  <p style="margin-top:8px">
+    <a href="privacidad.html" style="color:var(--lavanda-light);margin:0 12px">Privacidad</a>
+    <a href="terminos.html" style="color:var(--lavanda-light);margin:0 12px">Términos</a>
+    <a href="eliminacion-datos.html" style="color:var(--lavanda-light);margin:0 12px">Eliminación de Datos</a>
+  </p>
+</footer>
+</body>
+</html>

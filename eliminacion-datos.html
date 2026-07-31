@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Eliminación de Datos — Municipalidad de Ciudad de La Banda</title>
+  <meta name="description" content="Instrucciones para solicitar la eliminación de datos personales del sistema WhatsApp de la Municipalidad de Ciudad de La Banda.">
+  <link rel="icon" type="image/png" href="favicon64.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --lavanda: #7c3aed; --lavanda-light: #a78bfa; --gold: #f59e0b;
+      --green: #10b981; --red: #ef4444;
+      --bg: #08080f; --bg-card: #111122; --border: rgba(124,58,237,0.2);
+      --text: #f0edff; --muted: #a89fc4; --dim: #6b6488;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); line-height: 1.8; -webkit-font-smoothing: antialiased; }
+    .bg-grid { position: fixed; inset: 0; z-index: 0; pointer-events: none;
+      background-image: linear-gradient(rgba(124,58,237,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(124,58,237,0.04) 1px, transparent 1px); background-size: 40px 40px; }
+    .glow { position: fixed; border-radius: 50%; filter: blur(100px); pointer-events: none; }
+    .g1 { width: 500px; height: 500px; top: -150px; left: -150px; background: radial-gradient(circle, rgba(16,185,129,0.1), transparent 70%); }
+    .g2 { width: 400px; height: 400px; bottom: -100px; right: -100px; background: radial-gradient(circle, rgba(124,58,237,0.1), transparent 70%); }
+    header { position: sticky; top: 0; z-index: 100; background: rgba(8,8,15,0.85); backdrop-filter: blur(20px); border-bottom: 1px solid var(--border); padding: 16px 0; }
+    .header-inner { max-width: 860px; margin: 0 auto; padding: 0 24px; display: flex; align-items: center; justify-content: space-between; }
+    .logo-wrap { display: flex; align-items: center; gap: 14px; text-decoration: none; }
+    .logo-wrap img { width: 40px; height: 40px; object-fit: contain; }
+    .logo-text .org { font-size: 11px; color: var(--muted); font-weight: 500; }
+    .logo-text .city { font-size: 14px; font-weight: 800; color: var(--text); }
+    .back-btn { padding: 8px 18px; border-radius: 8px; background: rgba(124,58,237,0.12); border: 1px solid var(--border); color: var(--lavanda-light); font-size: 13px; font-weight: 600; text-decoration: none; transition: all 0.2s; }
+    .back-btn:hover { background: rgba(124,58,237,0.22); }
+    main { position: relative; z-index: 1; max-width: 860px; margin: 0 auto; padding: 56px 24px 80px; }
+    .page-badge { display: inline-flex; align-items: center; gap: 8px; background: rgba(16,185,129,0.1); border: 1px solid rgba(16,185,129,0.25); border-radius: 99px; padding: 6px 16px; font-size: 12px; font-weight: 600; color: var(--green); letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 20px; }
+    h1 { font-size: 38px; font-weight: 900; line-height: 1.15; margin-bottom: 12px; background: linear-gradient(135deg, #f0edff, var(--lavanda-light)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .meta-info { font-size: 13px; color: var(--dim); margin-bottom: 48px; }
+    .meta-info strong { color: var(--muted); }
+    .card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px; padding: 36px 40px; margin-bottom: 24px; }
+    h2 { font-size: 18px; font-weight: 700; color: var(--text); margin-bottom: 16px; display: flex; align-items: center; gap: 10px; padding-bottom: 12px; border-bottom: 1px solid var(--border); }
+    h2 .num { width: 28px; height: 28px; border-radius: 8px; background: rgba(16,185,129,0.15); color: var(--green); font-size: 13px; font-weight: 800; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    p { font-size: 15px; color: var(--muted); margin-bottom: 14px; }
+    ul { padding-left: 20px; margin-bottom: 14px; }
+    ul li { font-size: 15px; color: var(--muted); margin-bottom: 8px; }
+    ol { padding-left: 20px; margin-bottom: 14px; }
+    ol li { font-size: 15px; color: var(--muted); margin-bottom: 10px; }
+    strong { color: var(--text); font-weight: 600; }
+    a { color: var(--lavanda-light); }
+
+    /* Steps */
+    .steps { display: flex; flex-direction: column; gap: 16px; margin: 20px 0; }
+    .step {
+      display: flex; gap: 16px; align-items: flex-start;
+      background: rgba(255,255,255,0.03); border: 1px solid rgba(124,58,237,0.12);
+      border-radius: 12px; padding: 20px;
+    }
+    .step-num {
+      width: 36px; height: 36px; border-radius: 50%; flex-shrink: 0;
+      background: rgba(16,185,129,0.15); border: 1px solid rgba(16,185,129,0.3);
+      color: var(--green); font-size: 15px; font-weight: 800;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .step-content .step-title { font-size: 15px; font-weight: 700; color: var(--text); margin-bottom: 6px; }
+    .step-content .step-desc { font-size: 14px; color: var(--muted); line-height: 1.6; }
+
+    /* Email template */
+    .email-box {
+      background: rgba(0,0,0,0.4); border: 1px solid rgba(124,58,237,0.25);
+      border-radius: 12px; padding: 20px 24px; font-family: monospace;
+      font-size: 13px; color: #c9c0e8; line-height: 1.7; margin: 16px 0;
+    }
+    .email-box .field { color: var(--gold); font-weight: 600; }
+    .email-box .val { color: var(--text); }
+
+    /* CTA */
+    .cta-box {
+      background: linear-gradient(135deg, rgba(124,58,237,0.15), rgba(124,58,237,0.05));
+      border: 1px solid rgba(124,58,237,0.3); border-radius: 16px;
+      padding: 32px 36px; text-align: center; margin: 32px 0;
+    }
+    .cta-box h3 { font-size: 20px; font-weight: 800; margin-bottom: 8px; }
+    .cta-box p { margin-bottom: 20px; }
+    .cta-btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: linear-gradient(135deg, var(--lavanda), #5b21b6);
+      color: white; padding: 12px 28px; border-radius: 10px;
+      font-size: 15px; font-weight: 700; text-decoration: none;
+      box-shadow: 0 4px 20px rgba(124,58,237,0.35);
+      transition: all 0.2s;
+    }
+    .cta-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(124,58,237,0.45); }
+
+    .time-badge { display: inline-flex; align-items: center; gap: 6px; background: rgba(16,185,129,0.1); border: 1px solid rgba(16,185,129,0.25); border-radius: 8px; padding: 4px 12px; font-size: 13px; color: var(--green); font-weight: 600; margin-bottom: 12px; }
+
+    footer { text-align: center; padding: 32px 24px; border-top: 1px solid var(--border); font-size: 13px; color: var(--dim); position: relative; z-index: 1; }
+  </style>
+</head>
+<body>
+<div class="bg-grid"></div>
+<div class="glow g1"></div>
+<div class="glow g2"></div>
+
+<header>
+  <div class="header-inner">
+    <a class="logo-wrap" href="inicio.html">
+      <img src="logo-sm.png" alt="Escudo La Banda">
+      <div class="logo-text">
+        <div class="org">Municipalidad de</div>
+        <div class="city">Ciudad de La Banda</div>
+      </div>
+    </a>
+    <a class="back-btn" href="inicio.html">← Inicio</a>
+  </div>
+</header>
+
+<main>
+  <div class="page-badge">🗑️ Tus Derechos</div>
+  <h1>Eliminación de Datos de Usuario</h1>
+  <p class="meta-info"><strong>Derecho ARCO:</strong> Acceso, Rectificación, Cancelación y Oposición — Ley 25.326</p>
+
+  <div class="card">
+    <h2><span class="num">ℹ</span>¿Qué datos podés solicitar eliminar?</h2>
+    <p>Tenés derecho a solicitar la eliminación de tus datos personales de la base de comunicaciones municipales. Esto incluye:</p>
+    <ul>
+      <li>Tu nombre y apellido</li>
+      <li>Tu número de teléfono celular</li>
+      <li>Tu número de DNI</li>
+      <li>Tu historial de mensajes recibidos</li>
+      <li>Tu pertenencia a cualquier lista de contactos municipal</li>
+    </ul>
+    <p>Una vez eliminados, <strong>no recibirás más comunicaciones</strong> de la Municipalidad vía WhatsApp.</p>
+  </div>
+
+  <div class="card">
+    <h2><span class="num">✉</span>Cómo solicitar la eliminación</h2>
+    <div class="time-badge">⏱️ Respondemos en hasta 15 días hábiles</div>
+
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-content">
+          <div class="step-title">Enviá un email a nuestra dirección oficial</div>
+          <div class="step-desc">Escribí a <strong><a href="mailto:ochoalucinaciones@gmail.com">ochoalucinaciones@gmail.com</a></strong> con el asunto exacto: <strong>"Solicitud de Eliminación de Datos"</strong></div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-content">
+          <div class="step-title">Incluí los siguientes datos en el cuerpo del correo</div>
+          <div class="step-desc">Para verificar tu identidad y procesar la solicitud correctamente:</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-content">
+          <div class="step-title">Recibirás confirmación</div>
+          <div class="step-desc">Te enviaremos un correo confirmando la recepción y luego otro confirmando la eliminación efectiva de tus datos.</div>
+        </div>
+      </div>
+    </div>
+
+    <p style="margin-top:8px;font-size:14px;color:var(--dim)">Modelo de email a enviar:</p>
+    <div class="email-box">
+      <span class="field">Para:</span> <span class="val">ochoalucinaciones@gmail.com</span><br>
+      <span class="field">Asunto:</span> <span class="val">Solicitud de Eliminación de Datos</span><br><br>
+      Estimada Municipalidad de Ciudad de La Banda,<br><br>
+      Solicito la eliminación de mis datos personales de su base de contactos.<br><br>
+      <span class="field">Nombre completo:</span> <span class="val">[Tu nombre y apellido]</span><br>
+      <span class="field">DNI:</span> <span class="val">[Tu número de DNI]</span><br>
+      <span class="field">Teléfono WhatsApp:</span> <span class="val">[+54 9 XXXXXXXXX]</span><br>
+      <span class="field">Correo electrónico:</span> <span class="val">[Tu email]</span><br><br>
+      Solicito la confirmación de la eliminación una vez procesada.<br><br>
+      Atentamente,<br>
+      [Tu nombre]
+    </div>
+  </div>
+
+  <div class="cta-box">
+    <h3>¿Preferís enviar el email directamente?</h3>
+    <p>Hacé clic en el botón y completá el formulario pre-cargado</p>
+    <a class="cta-btn" href="mailto:ochoalucinaciones@gmail.com?subject=Solicitud%20de%20Eliminaci%C3%B3n%20de%20Datos&body=Estimada%20Municipalidad%20de%20Ciudad%20de%20La%20Banda%2C%0A%0ASolicito%20la%20eliminaci%C3%B3n%20de%20mis%20datos%20personales%20de%20su%20base%20de%20contactos.%0A%0ANombre%20completo%3A%20%5BTu%20nombre%5D%0ADNI%3A%20%5BTu%20DNI%5D%0ATel%C3%A9fono%3A%20%5B%2B54%209%20XXXXXXXXX%5D%0AEmail%3A%20%5BTu%20email%5D%0A%0ASolicito%20confirmaci%C3%B3n%20de%20la%20eliminaci%C3%B3n.%0A%0AAtentamente%2C%0A%5BTu%20nombre%5D">
+      ✉️ Enviar Solicitud de Eliminación
+    </a>
+  </div>
+
+  <div class="card">
+    <h2><span class="num">⚖</span>Plazo de Respuesta</h2>
+    <p>De acuerdo con la <strong>Ley N° 25.326 de Protección de Datos Personales</strong> de la República Argentina, nos comprometemos a:</p>
+    <ul>
+      <li>Confirmar la recepción de tu solicitud dentro de los <strong>5 días hábiles</strong></li>
+      <li>Procesar y confirmar la eliminación efectiva dentro de los <strong>15 días hábiles</strong></li>
+      <li>En caso de rechazo, notificarte con los motivos fundados dentro del mismo plazo</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h2><span class="num">📋</span>Datos que se conservan por obligación legal</h2>
+    <p>Aún ante una solicitud de eliminación, la Municipalidad puede conservar ciertos registros cuando sea necesario por:</p>
+    <ul>
+      <li>Obligaciones legales de auditoría y control público</li>
+      <li>Procedimientos administrativos o judiciales pendientes</li>
+      <li>Interés público legítimo de gestión gubernamental</li>
+    </ul>
+    <p>En estos casos, te notificaremos qué datos se conservan y por qué motivo.</p>
+  </div>
+
+  <div class="card">
+    <h2><span class="num">🔗</span>Eliminación vía Facebook (Meta)</h2>
+    <p>Si accediste a este sistema a través de una aplicación de Facebook/Meta, también podés solicitar la eliminación de datos directamente desde tu cuenta de Facebook:</p>
+    <ol>
+      <li>Ingresá a <a href="https://www.facebook.com/settings" target="_blank" rel="noopener">facebook.com/settings</a></li>
+      <li>Ve a <strong>Seguridad → Aplicaciones y sitios web</strong></li>
+      <li>Buscá <strong>"Ciudad de La Banda"</strong></li>
+      <li>Hacé clic en <strong>Eliminar</strong></li>
+    </ol>
+    <p>Esta acción eliminará el acceso de la aplicación a tu información de Facebook.</p>
+  </div>
+</main>
+
+<footer>
+  <p>© 2025 Municipalidad de Ciudad de La Banda — Santiago del Estero, Argentina</p>
+  <p style="margin-top:8px">
+    <a href="privacidad.html" style="color:var(--lavanda-light);margin:0 12px">Privacidad</a>
+    <a href="terminos.html" style="color:var(--lavanda-light);margin:0 12px">Términos</a>
+    <a href="eliminacion-datos.html" style="color:var(--lavanda-light);margin:0 12px">Eliminación de Datos</a>
+  </p>
+</footer>
+</body>
+</html>
