@@ -1043,3 +1043,133 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 // Exponer también a nivel de módulo por si se carga antes que DOMContentLoaded complete
 window.navigateTo = navigateTo;
+
+// ═══════════════════════════════════════════════
+// REGISTRO DE NÚMERO WHATSAPP — funciones globales
+// ═══════════════════════════════════════════════
+const PHONE_ID = '1203166949555904';
+
+function regLog(msg, type = 'info') {
+  const el = document.getElementById('reg-log');
+  if (!el) return;
+  const ts = new Date().toLocaleTimeString('es-AR');
+  const line = document.createElement('div');
+  line.className = `log-line ${type}`;
+  line.innerHTML = `<span class="log-ts">${ts}</span>${msg}`;
+  el.appendChild(line);
+  el.scrollTop = el.scrollHeight;
+}
+
+function setRegStatus(msg, color) {
+  const el = document.getElementById('reg-status-box');
+  if (!el) return;
+  el.style.display = 'block';
+  el.style.background = `rgba(${color},0.12)`;
+  el.style.border = `1px solid rgba(${color},0.3)`;
+  el.style.color = `rgb(${color})`;
+  el.textContent = msg;
+}
+
+async function requestVerificationCode(method) {
+  const token = localStorage.getItem('waba_token') || localStorage.getItem('mlv_token');
+  if (!token) {
+    regLog('❌ No hay token guardado. Guardá primero las credenciales en Configuración.', 'error');
+    return;
+  }
+  regLog(`📤 Solicitando código por ${method === 'SMS' ? 'SMS' : 'llamada de voz'}...`, 'info');
+
+  try {
+    const res = await fetch(`https://graph.facebook.com/v20.0/${PHONE_ID}/request_code`, {
+      method: 'POST',
+      headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ code_method: method, language: 'es' }),
+    });
+    const data = await res.json();
+    if (data.success || data.id) {
+      regLog(`✅ Código enviado por ${method}. Revisá el teléfono +54 9 385 628-1200 e ingresá el código.`, 'success');
+      setRegStatus('✅ Código enviado — ingresá los 6 dígitos arriba', '16,185,129');
+    } else {
+      const err = data.error?.message || JSON.stringify(data);
+      regLog(`❌ Error al solicitar código: ${err}`, 'error');
+      if (err.includes('WhatsApp')) {
+        regLog('⚠️ El número posiblemente tiene WhatsApp personal activo. Eliminá la cuenta desde el teléfono primero.', 'warning');
+      }
+      setRegStatus('❌ Error: ' + err, '239,68,68');
+    }
+  } catch (e) {
+    regLog(`❌ Error de red: ${e.message}`, 'error');
+  }
+}
+
+async function verifyPhoneCode() {
+  const code = document.getElementById('verify-code-input')?.value?.trim();
+  if (!code || code.length !== 6) {
+    regLog('❌ Ingresá el código de 6 dígitos.', 'error');
+    return;
+  }
+  const token = localStorage.getItem('waba_token') || localStorage.getItem('mlv_token');
+  if (!token) {
+    regLog('❌ No hay token. Guardá las credenciales primero.', 'error');
+    return;
+  }
+  regLog(`🔐 Verificando código ${code}...`, 'info');
+
+  try {
+    const res = await fetch(`https://graph.facebook.com/v20.0/${PHONE_ID}/verify_code`, {
+      method: 'POST',
+      headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ code }),
+    });
+    const data = await res.json();
+    if (data.success || data.id) {
+      regLog('🎉 ¡Número REGISTRADO exitosamente! Ya podés enviar mensajes.', 'success');
+      setRegStatus('🎉 ¡Número registrado y activo!', '16,185,129');
+    } else {
+      const err = data.error?.message || JSON.stringify(data);
+      regLog(`❌ Código incorrecto o expirado: ${err}`, 'error');
+      regLog('💡 Solicitá un nuevo código y volvé a intentarlo.', 'info');
+      setRegStatus('❌ Verificación fallida — solicitá nuevo código', '239,68,68');
+    }
+  } catch (e) {
+    regLog(`❌ Error de red: ${e.message}`, 'error');
+  }
+}
+
+async function checkPhoneStatus() {
+  const token = localStorage.getItem('waba_token') || localStorage.getItem('mlv_token');
+  if (!token) {
+    regLog('❌ No hay token. Guardá las credenciales primero.', 'error');
+    return;
+  }
+  regLog('🔍 Consultando estado del número en Meta...', 'info');
+
+  try {
+    const fields = 'id,display_phone_number,verified_name,code_verification_status,quality_rating,platform_type';
+    const res = await fetch(`https://graph.facebook.com/v20.0/${PHONE_ID}?fields=${fields}`, {
+      headers: { 'Authorization': `Bearer ${token}` },
+    });
+    const data = await res.json();
+    if (data.id) {
+      const status = data.code_verification_status;
+      const isVerified = status === 'VERIFIED';
+      regLog(`📋 Número: ${data.display_phone_number}`, 'info');
+      regLog(`📋 Nombre: ${data.verified_name || '—'}`, 'info');
+      regLog(`📋 Estado: ${status || '—'}`, isVerified ? 'success' : 'warning');
+      regLog(`📋 Calidad: ${data.quality_rating || '—'}`, 'info');
+      regLog(`📋 Plataforma: ${data.platform_type || '—'}`, 'info');
+      if (isVerified) {
+        setRegStatus('✅ Número VERIFICADO y activo en WhatsApp Business API', '16,185,129');
+      } else {
+        setRegStatus(`Estado: ${status} — Aún no está registrado`, '245,158,11');
+      }
+    } else {
+      regLog('❌ Error consultando Meta: ' + (data.error?.message || JSON.stringify(data)), 'error');
+    }
+  } catch (e) {
+    regLog(`❌ Error de red: ${e.message}`, 'error');
+  }
+}
+
+window.requestVerificationCode = requestVerificationCode;
+window.verifyPhoneCode          = verifyPhoneCode;
+window.checkPhoneStatus         = checkPhoneStatus;
