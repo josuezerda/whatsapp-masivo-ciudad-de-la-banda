@@ -86,7 +86,7 @@ function renderOverview() {
   // Contadores: total contactos real, el resto en 0
   animateCounter('metric-total',     stats.total);
   animateCounter('metric-sent',      0);
-  animateCounter('metric-delivery',  0, '%');
+  animateCounter('metric-delivery',  0);
   animateCounter('metric-campaigns', 0);
 
   // Bases listas para enviar
@@ -405,10 +405,28 @@ async function startCampaign() {
       paramBuilder: (contact) => {
         const tpl = State.currentCampaignDraft.templateObj;
         if (!tpl) return [];
-        return tpl.variables.map((v, i) => ({
-          type: 'body',
-          parameters: [{ type: 'text', text: v === 'nombre' ? contact.nombre : (varValues[v] || '') }],
-        })).slice(0, 1); // simplificado: 1 componente body
+        
+        const comps = [];
+        
+        // Header de imagen
+        if (tpl.hasImage && State.currentCampaignDraft.imageUrl) {
+          comps.push({
+            type: 'header',
+            parameters: [{ type: 'image', image: { link: State.currentCampaignDraft.imageUrl } }]
+          });
+        }
+        
+        // Variables del body
+        if (tpl.variables && tpl.variables.length > 0) {
+          const bodyParams = tpl.variables.map(v => {
+            let val = varValues[v] || '';
+            if (v === 'nombre') val = contact.nombre || 'Vecino/a';
+            return { type: 'text', text: val };
+          });
+          comps.push({ type: 'body', parameters: bodyParams });
+        }
+        
+        return comps;
       },
       onProgress: (sent, total, contact, result) => {
         if (result.status === 'sent') {
@@ -787,6 +805,13 @@ function renderConfig() {
     const el = $(`cfg-${f}`);
     if (el) el.value = cfg[f] || '';
   });
+
+  // Modo simulación
+  const simNum = localStorage.getItem('mlv_sim_numbers') || '';
+  const simDur = localStorage.getItem('mlv_sim_duration') || '3600000';
+  if ($('cfg-simNumbers')) $('cfg-simNumbers').value = simNum;
+  if ($('cfg-simDuration')) $('cfg-simDuration').value = simDur;
+
   updateApiStatus();
 }
 
@@ -800,6 +825,14 @@ function saveConfig() {
   };
   WhatsAppAPI.saveConfig(cfg);
   showToast('success', 'Configuración guardada', 'Las credenciales fueron almacenadas localmente.');
+}
+
+function saveSimConfig() {
+  const nums = $('cfg-simNumbers')?.value?.trim() || '';
+  const dur = $('cfg-simDuration')?.value || '3600000';
+  localStorage.setItem('mlv_sim_numbers', nums);
+  localStorage.setItem('mlv_sim_duration', dur);
+  showToast('success', 'Simulación Guardada', 'La lista de números reales ha sido actualizada.');
 }
 
 async function testConnection() {
@@ -1003,6 +1036,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // Config
   $('btn-save-config')?.addEventListener('click', saveConfig);
+  $('btn-save-sim')?.addEventListener('click', saveSimConfig);
   $('btn-test-connection')?.addEventListener('click', testConnection);
 
   // Wizard steps

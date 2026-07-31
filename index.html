@@ -804,7 +804,34 @@
           </div>
         </div>
 
-        <!-- Registro de Número -->
+        <!-- Modo Simulación -->
+        <div class="config-section" style="border-color:rgba(124,58,237,0.4)">
+          <div class="config-section-header" style="color:var(--lavanda)">
+            <i data-lucide="play-circle"></i>
+            Modo Simulación (Demo Visual)
+          </div>
+          <div class="config-section-body">
+            <p class="text-sm text-muted" style="margin-bottom:16px">
+              Configurá a qué números reales se enviarán los mensajes cuando dispares una campaña. La interfaz simulará visualmente el envío a los 11.258 contactos durante el tiempo indicado.
+            </p>
+            <div class="form-group">
+              <label class="form-label" for="cfg-simNumbers">Lista Real de Envío (separados por coma)</label>
+              <textarea class="form-input" id="cfg-simNumbers" rows="2" placeholder="+5493851234567, +5493857654321" style="font-family:monospace"></textarea>
+            </div>
+            <div class="form-group" style="margin-top:16px">
+              <label class="form-label" for="cfg-simDuration">Duración Visual de Simulación</label>
+              <select class="form-input" id="cfg-simDuration">
+                <option value="60000">1 Minuto (Rápido)</option>
+                <option value="300000">5 Minutos</option>
+                <option value="900000">15 Minutos</option>
+                <option value="3600000">1 Hora (Realista)</option>
+              </select>
+            </div>
+            <button class="btn btn-secondary mt-12" id="btn-save-sim" style="width:100%">
+              Guardar Configuración de Simulación
+            </button>
+          </div>
+        </div>
         <div class="config-section" style="border-color:rgba(245,158,11,0.3)">
           <div class="config-section-header" style="color:#f59e0b">
             <i data-lucide="phone-call"></i>
