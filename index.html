@@ -17,6 +17,9 @@
   <!-- Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 
+  <!-- Supabase SDK -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+
   <!-- Estilos -->
   <link rel="stylesheet" href="styles/main.css">
 
@@ -120,6 +123,13 @@
         <p id="topbar-sub">Resumen general del sistema</p>
       </div>
       <div class="topbar-actions">
+        <div style="display:flex;align-items:center;gap:10px;padding:6px 12px;border-radius:10px;background:rgba(124,58,237,0.08);border:1px solid rgba(124,58,237,0.2)">
+          <span style="font-size:18px">👤</span>
+          <div style="line-height:1.2">
+            <div style="font-size:12px;font-weight:700;color:var(--text-primary)" id="topbar-user-name">Administrador</div>
+            <div style="font-size:10px;color:var(--text-muted)" id="topbar-user-email">—</div>
+          </div>
+        </div>
         <button class="topbar-btn secondary" id="btn-import-csv">
           <i data-lucide="upload" style="width:15px;height:15px"></i>
           Importar CSV
@@ -127,6 +137,9 @@
         <button class="topbar-btn gold" id="btn-new-campaign">
           <i data-lucide="zap" style="width:15px;height:15px"></i>
           Nueva Campaña
+        </button>
+        <button class="topbar-btn secondary" id="btn-logout" title="Cerrar sesión" style="padding:8px 12px">
+          <i data-lucide="log-out" style="width:15px;height:15px"></i>
         </button>
       </div>
     </header>

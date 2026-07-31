@@ -1,13 +1,14 @@
 /**
  * app.js
  * Controlador principal del Dashboard
- * Municipalidad de Lavanda — Sistema WhatsApp Masivo
+ * Municipalidad de Ciudad de La Banda — Sistema WhatsApp Masivo
  */
 
 import WhatsAppAPI from './modules/whatsapp-api.js';
 import Database    from './modules/database.js';
 import Campaigns   from './modules/campaigns.js';
 import Templates   from './modules/templates.js';
+import Auth        from './modules/auth.js';
 
 // ── ESTADO GLOBAL ─────────────────────────────
 const State = {
@@ -979,7 +980,7 @@ window.importCSV = function() {
 };
 
 // ── INICIALIZACIÓN ─────────────────────────────
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
   initNavigation();
   navigateTo('overview');
 
@@ -1005,6 +1006,23 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Actualizar segmento al cambiar
   $('send-segment')?.addEventListener('change', updateSendCount);
+
+  // ── AUTH ───────────────────────────────────────
+  // Verificar sesión: redirige a login.html si no está autenticado
+  const authed = await Auth.requireAuth();
+  if (!authed) return;
+
+  // Mostrar datos del usuario en topbar
+  const nameEl  = $('topbar-user-name');
+  const emailEl = $('topbar-user-email');
+  if (nameEl)  nameEl.textContent  = Auth.getDisplayName();
+  if (emailEl) emailEl.textContent = Auth.getEmail();
+
+  // Logout
+  $('btn-logout')?.addEventListener('click', async () => {
+    await Auth.signOut();
+    window.location.href = 'login.html';
+  });
 
   // Exponer globalmente para inline handlers
   window.navigateTo = navigateTo;
