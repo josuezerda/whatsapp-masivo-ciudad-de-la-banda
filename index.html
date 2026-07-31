@@ -757,7 +757,8 @@
               <div class="form-group">
                 <label class="form-label" for="cfg-webhookToken">Webhook Verify Token</label>
                 <div class="credential-field">
-                  <input class="form-input" id="cfg-webhookToken" type="password"
+                  <input class="form-input" id="cfg-webhookToken" type="text"
+                    value="banda_webhook_2025"
                     placeholder="Tu string secreto del webhook" autocomplete="off">
                   <button class="reveal-btn" onclick="toggleReveal('cfg-webhookToken')" title="Mostrar/ocultar">👁️</button>
                 </div>
@@ -786,14 +787,19 @@
             Configuración del Webhook
           </div>
           <div class="config-section-body">
-            <div style="background:rgba(15,15,30,0.8);border:1px solid var(--glass-border);border-radius:var(--radius-sm);padding:16px;font-family:'Courier New',monospace;font-size:13px;color:var(--text-secondary);line-height:2">
-              <div><span style="color:var(--lavanda-400)">URL de Callback:</span> https://TU_SERVIDOR/webhook</div>
-              <div><span style="color:var(--lavanda-400)">Verify Token:</span> [el que configuraste arriba]</div>
-              <div><span style="color:var(--lavanda-400)">Eventos a suscribir:</span> messages, message_deliveries, message_reads</div>
+            <div style="background:rgba(15,15,30,0.9);border:1px solid rgba(124,58,237,0.35);border-radius:var(--radius-sm);padding:20px;font-family:'Courier New',monospace;font-size:13px;line-height:2.2">
+              <div><span style="color:#a78bfa;font-weight:600">URL de Callback (webhook):</span><br>
+                <span style="color:#f0edff;font-size:14px;font-weight:700">https://whatsapp-masivo-ciudad-de-la-banda.vercel.app/api/webhook</span>
+              </div>
+              <div style="margin-top:8px"><span style="color:#a78bfa;font-weight:600">Token de verificación:</span><br>
+                <span style="color:#fbbf24;font-size:14px;font-weight:700">banda_webhook_2025</span>
+              </div>
+              <div style="margin-top:8px"><span style="color:#a78bfa;font-weight:600">Eventos a suscribir:</span><br>
+                <span style="color:#10b981">messages &nbsp;•&nbsp; message_deliveries &nbsp;•&nbsp; message_reads</span>
+              </div>
             </div>
-            <p class="text-sm text-muted mt-12">
-              ⚠️ El webhook necesita una URL HTTPS pública. Para pruebas locales usá <strong style="color:var(--lavanda-400)">ngrok</strong>.
-              Encontrás el servidor webhook listo para copiar en el archivo <strong>webhook-server.md</strong>.
+            <p class="text-sm text-muted mt-12" style="color:#10b981;font-weight:600">
+              ✅ Webhook activo en Vercel — No necesitás ngrok ni servidor propio.
             </p>
           </div>
         </div>

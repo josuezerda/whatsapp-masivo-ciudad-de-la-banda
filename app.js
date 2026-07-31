@@ -265,10 +265,36 @@ function updateTemplatePreview(name) {
   if (!tpl || !previewEl) return;
 
   previewEl.innerHTML = Templates.renderPreview(tpl.body, {});
-  State.currentCampaignDraft.template = name;
+  State.currentCampaignDraft.template    = name;
   State.currentCampaignDraft.templateObj = tpl;
 
-  // Mostrar campos de variables
+  // Campo de imagen si el template lo requiere
+  let imageSection = $('template-image-section');
+  if (!imageSection) {
+    imageSection = document.createElement('div');
+    imageSection.id = 'template-image-section';
+    previewEl.parentElement?.insertBefore(imageSection, previewEl);
+  }
+
+  if (tpl.hasImage) {
+    imageSection.innerHTML = `
+      <div class="form-group" style="margin-bottom:16px">
+        <label class="form-label">🖼️ URL de imagen (header del mensaje)</label>
+        <input class="form-input" id="tpl-image-url" type="url"
+          placeholder="https://ejemplo.com/imagen.jpg"
+          value="${tpl.imageUrl || ''}"
+          style="border-color:rgba(245,158,11,0.4)">
+        <div style="font-size:12px;color:var(--text-muted);margin-top:6px">
+          Debe ser una URL pública HTTPS con imagen JPG/PNG. Meta la descargará al enviar.
+        </div>
+      </div>`;
+    $('tpl-image-url')?.addEventListener('input', e => {
+      State.currentCampaignDraft.imageUrl = e.target.value;
+    });
+  } else {
+    imageSection.innerHTML = '';
+  }
+
   if (varsEl && tpl.variables.length > 0) {
     varsEl.style.display = 'block';
     $('template-vars-form').innerHTML = tpl.variables.map((v, i) => `

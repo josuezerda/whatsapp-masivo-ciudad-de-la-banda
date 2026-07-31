@@ -6,7 +6,7 @@
 
 const Templates = (() => {
 
-  const STORAGE_KEY = 'mlv_templates_v2';
+  const STORAGE_KEY = 'mlv_templates_v3'; // v3 — incluye consulta_padron
   let _templates = [];
 
   function load() {
@@ -22,7 +22,26 @@ const Templates = (() => {
   function getDefaultTemplates() {
     return [
 
-      // ── DIRECCIÓN DE TRÁNSITO ──────────────────
+      // ── CONSULTA PADRÓN (APROBADA META) ───────
+      {
+        id: 'tpl_consulta_padron',
+        name: 'consulta_padron',
+        displayName: '¡Buen día! Consulta Padrón Municipal',
+        category: 'MARKETING',
+        segmento: 'Generales',
+        status: 'APPROVED',
+        language: 'es_AR',
+        hasImage: true,          // ← header de imagen
+        hasButton: true,         // ← botón URL
+        buttonType: 'URL',
+        buttonText: 'Ver enlace',
+        body: '¡Buen dia *compañe{{1}}*! Te saluda la *Municipalidad de Ciudad de La Banda* 🏛️\n\n{{2}}\n\n👉 {{3}}',
+        variables: ['nombre', 'mensaje', 'link'],
+        imageUrl: '',            // ← se configura antes de enviar
+        usageCount: 0,
+        lastUsed: null,
+      },
+
       {
         id: 'tpl_transito_01',
         name: 'transito_vencimiento_licencia',
