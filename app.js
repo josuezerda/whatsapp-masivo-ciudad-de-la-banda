@@ -83,54 +83,48 @@ function renderOverview() {
   const camps  = Campaigns.getGlobalStats();
   const recent = Campaigns.getRecentActivity();
 
-  // Animar contadores
-  animateCounter('metric-total', stats.total);
-  animateCounter('metric-sent', camps.totalSent);
-  animateCounter('metric-delivery', camps.avgDeliveryRate, '%');
-  animateCounter('metric-campaigns', camps.totalCampaigns);
+  // Contadores: total contactos real, el resto en 0
+  animateCounter('metric-total',     stats.total);
+  animateCounter('metric-sent',      0);
+  animateCounter('metric-delivery',  0, '%');
+  animateCounter('metric-campaigns', 0);
 
-  // Campañas activas
-  renderActiveCampaigns();
+  // Bases listas para enviar
+  renderBasesList();
 
-  // Gráfico de actividad
+  // Gráfico de actividad (todo en 0)
   renderActivityChart(recent);
 
-  // Distribución por barrio
-  renderBarrioChart(stats.barrios);
+  // Distribución por segmento
+  renderSegmentChart(stats.bySegmento);
 }
 
-function renderActiveCampaigns() {
-  const running = Campaigns.getAll().filter(c => c.status === 'running' || c.status === 'scheduled');
+function renderBasesList() {
   const el = $('active-campaigns-list');
   if (!el) return;
+  const stats = Database.getStats();
+  const meta  = Database.getSegmentosMeta();
+  const colors = { 'Dirección de Tránsito': '#7c3aed', 'Dirección de Libre Deuda': '#f59e0b', 'Generales': '#10b981' };
+  const icons  = { 'Dirección de Tránsito': '🚗', 'Dirección de Libre Deuda': '📄', 'Generales': '🏡' };
 
-  if (running.length === 0) {
-    el.innerHTML = `<p class="text-muted text-sm" style="text-align:center;padding:24px">
-      No hay campañas activas en este momento.
-    </p>`;
-    return;
-  }
-
-  el.innerHTML = running.map(c => {
-    const pct = c.total > 0 ? Math.round(c.sent / c.total * 100) : 0;
-    const statusBadge = c.status === 'running'
-      ? `<span class="badge badge-success">🟢 Enviando</span>`
-      : `<span class="badge badge-warning">⏳ Programada</span>`;
+  el.innerHTML = Object.entries(stats.bySegmento).map(([seg, count]) => {
+    const color = colors[seg] || '#7c3aed';
+    const icon  = icons[seg]  || '📂';
+    const pct   = Math.round(count / stats.total * 100);
     return `
-      <div style="padding:16px;border-bottom:1px solid var(--bg-border)">
+      <div style="padding:16px 20px;border-bottom:1px solid var(--bg-border)">
         <div class="flex-between mb-8">
-          <div>
-            <div class="fw-600 text-sm">${c.name}</div>
-            <div class="text-xs text-muted mt-4">${c.segmentLabel} · ${c.total.toLocaleString()} contactos</div>
+          <div class="flex gap-8 flex-center">
+            <span style="font-size:18px">${icon}</span>
+            <div>
+              <div class="fw-600 text-sm">${seg}</div>
+              <div class="text-xs text-muted mt-4">${count.toLocaleString('es-AR')} contactos &mdash; ${pct}% del total</div>
+            </div>
           </div>
-          ${statusBadge}
+          <span class="badge badge-lavanda">Lista para enviar</span>
         </div>
         <div class="progress-track">
-          <div class="progress-fill" style="width:${pct}%"></div>
-        </div>
-        <div class="flex-between mt-8">
-          <span class="text-xs text-muted">${c.sent.toLocaleString()} enviados</span>
-          <span class="text-xs text-lavanda fw-600">${pct}%</span>
+          <div style="height:100%;border-radius:99px;background:${color};width:${pct}%;transition:width 0.5s ease"></div>
         </div>
       </div>`;
   }).join('');
@@ -179,30 +173,30 @@ function renderActivityChart(data) {
   });
 }
 
-function renderBarrioChart(barrios) {
-  const canvas = $('chart-barrios');
+function renderSegmentChart(bySegmento = {}) {
+  const canvas = $('chart-barrio');
   if (!canvas || !window.Chart) return;
 
   if (canvas._chart) canvas._chart.destroy();
 
-  const sorted = Object.entries(barrios).sort((a, b) => b[1] - a[1]).slice(0, 8);
-  const colors = ['#7c3aed','#8b5cf6','#a78bfa','#f59e0b','#fbbf24','#10b981','#3b82f6','#ef4444'];
+  const segmentos = Object.entries(bySegmento);
+  const colors = ['#7c3aed', '#f59e0b', '#10b981'];
 
   canvas._chart = new Chart(canvas, {
     type: 'doughnut',
     data: {
-      labels: sorted.map(([k]) => k),
+      labels: segmentos.map(([k]) => k),
       datasets: [{
-        data: sorted.map(([, v]) => v),
+        data: segmentos.map(([, v]) => v),
         backgroundColor: colors,
         borderWidth: 0,
-        hoverOffset: 8,
+        hoverOffset: 10,
       }]
     },
     options: {
       responsive: true, maintainAspectRatio: false,
       plugins: {
-        legend: { position: 'right', labels: { color: '#a89fc4', boxWidth: 12, font: { size: 12 }, padding: 10 } },
+        legend: { position: 'right', labels: { color: '#a89fc4', boxWidth: 12, font: { size: 12 }, padding: 12 } },
       },
     }
   });
@@ -231,36 +225,35 @@ function populateTemplateSelect() {
 function populateSegmentOptions() {
   const sel = $('send-segment');
   if (!sel) return;
-  const barrios = Database.getBarrios();
   const stats = Database.getStats();
 
-  sel.innerHTML = `<option value="all">Todos los contactos (${stats.active.toLocaleString()} activos)</option>` +
-    barrios.map(b => {
-      const count = stats.barrios[b] || 0;
-      return `<option value="barrio:${b}">Barrio ${b} (${count.toLocaleString()})</option>`;
-    }).join('');
+  sel.innerHTML =
+    `<option value="all">Todas las bases (${stats.active.toLocaleString('es-AR')} contactos activos)</option>` +
+    Object.entries(stats.bySegmento).map(([seg, count]) =>
+      `<option value="seg:${seg}">${seg} (${count.toLocaleString('es-AR')} contactos)</option>`
+    ).join('');
 
   sel.addEventListener('change', updateSendCount);
   updateSendCount();
 }
 
 function updateSendCount() {
-  const seg = $('send-segment')?.value || 'all';
+  const seg   = $('send-segment')?.value || 'all';
   const stats = Database.getStats();
   let count;
 
   if (seg === 'all') {
     count = stats.active;
-  } else if (seg.startsWith('barrio:')) {
-    const b = seg.replace('barrio:', '');
-    count = stats.barrios[b] || 0;
+  } else if (seg.startsWith('seg:')) {
+    const s = seg.replace('seg:', '');
+    count = stats.bySegmento[s] || 0;
   } else {
     count = stats.active;
   }
 
   const el = $('send-count');
-  if (el) el.textContent = count.toLocaleString();
-  State.currentCampaignDraft.count = count;
+  if (el) el.textContent = count.toLocaleString('es-AR');
+  State.currentCampaignDraft.count   = count;
   State.currentCampaignDraft.segment = seg;
 }
 
@@ -463,8 +456,7 @@ function renderDatabase() {
 function renderContactsTable() {
   const result = Database.query({
     search: State.dbSearch,
-    barrio: State.dbBarrio,
-    categoria: State.dbCategoria,
+    segmento: State.dbSegmento,
     status: State.dbStatus,
     page: State.dbPage,
     perPage: 50,
@@ -477,19 +469,17 @@ function renderContactsTable() {
     <tr>
       <td>${c.nombre}</td>
       <td><code style="font-size:12px;color:var(--text-muted)">${c.phone}</code></td>
-      <td>${c.barrio}</td>
-      <td>${c.categoria}</td>
+      <td>${c.dni || '—'}</td>
+      <td><span class="badge badge-lavanda" style="font-size:11px">${c.segmento}</span></td>
       <td>${statusBadge(c.status)}</td>
       <td>${msgStatusBadge(c.msgStatus)}</td>
       <td class="text-muted text-xs">${c.lastContact ? new Date(c.lastContact).toLocaleDateString('es-AR') : '—'}</td>
     </tr>
   `).join('');
 
-  // Info
   const infoEl = $('db-info');
-  if (infoEl) infoEl.textContent = `${result.total.toLocaleString()} resultados · Página ${result.page} de ${result.totalPages}`;
+  if (infoEl) infoEl.textContent = `${result.total.toLocaleString('es-AR')} resultados · Página ${result.page} de ${result.totalPages}`;
 
-  // Paginación
   renderPagination('db-pagination', result.page, result.totalPages, p => {
     State.dbPage = p;
     renderContactsTable();
@@ -501,12 +491,9 @@ function renderDBStats() {
   const el = $('db-stats-bar');
   if (!el) return;
   el.innerHTML = `
-    <span class="badge badge-success">✅ Activos: ${s.active.toLocaleString()}</span>
-    <span class="badge badge-muted">😶 Inactivos: ${s.inactive.toLocaleString()}</span>
-    <span class="badge badge-danger">🚫 Bloqueados: ${s.blocked.toLocaleString()}</span>
-    <span class="badge badge-lavanda">📨 Enviados: ${s.sent.toLocaleString()}</span>
-    <span class="badge badge-info">📬 Entregados: ${s.delivered.toLocaleString()}</span>
-    <span class="badge badge-warning">👁️ Leídos: ${s.read.toLocaleString()}</span>
+    <span class="badge badge-success">✅ Activos: ${s.active.toLocaleString('es-AR')}</span>
+    <span class="badge badge-muted">📤 Por enviar: ${s.pending.toLocaleString('es-AR')}</span>
+    <span class="badge badge-lavanda">📨 Enviados: 0</span>
   `;
 }
 
@@ -520,12 +507,12 @@ function setupDBFilters() {
     }, 350));
   }
 
-  const barrioSel = $('db-barrio');
-  if (barrioSel) {
-    barrioSel.innerHTML = '<option value="">Todos los barrios</option>' +
-      Database.getBarrios().map(b => `<option>${b}</option>`).join('');
-    barrioSel.addEventListener('change', () => {
-      State.dbBarrio = barrioSel.value;
+  const segSel = $('db-barrio');
+  if (segSel) {
+    segSel.innerHTML = '<option value="">Todas las bases</option>' +
+      Database.getSegmentos().map(s => `<option value="${s}">${s}</option>`).join('');
+    segSel.addEventListener('change', () => {
+      State.dbSegmento = segSel.value;
       State.dbPage = 1;
       renderContactsTable();
     });
