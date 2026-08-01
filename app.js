@@ -294,7 +294,10 @@ function updateTemplatePreview(name) {
     
     setTimeout(() => {
       if (typeof lucide !== 'undefined') lucide.createIcons();
-      $('btn-upload-image').addEventListener('click', () => $('tpl-image-file').click());
+      $('btn-upload-image').addEventListener('click', () => {
+        $('tpl-image-file').value = ''; // Reset for same file selection
+        $('tpl-image-file').click();
+      });
       $('tpl-image-file').addEventListener('change', async (e) => {
         const file = e.target.files[0];
         if (!file) return;
