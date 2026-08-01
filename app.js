@@ -317,13 +317,21 @@ function updateTemplatePreview(name) {
           if (data.id) {
             State.currentCampaignDraft.mediaId = data.id;
             State.currentCampaignDraft.imageUrl = null; // Limpiar url si hay media ID
-            $('tpl-image-status').innerHTML = '<span style="color:#10b981">✅ Imagen subida y lista</span>';
+            $('tpl-image-status').innerHTML = '<span style="color:#10b981">✅ Guardada en Meta</span>';
+            const btn = $('btn-upload-image');
+            btn.innerHTML = '<i data-lucide="check-circle"></i> Imagen Lista';
+            btn.className = 'btn btn-success';
+            btn.style.backgroundColor = '#10b981';
+            btn.style.color = 'white';
+            if (typeof lucide !== 'undefined') lucide.createIcons();
           } else {
             $('tpl-image-status').innerHTML = '<span style="color:#ef4444">❌ Error al subir</span>';
+            alert('Error de Meta: ' + (data.error?.message || 'Revisá que la API esté conectada.'));
             console.error(data);
           }
         } catch (err) {
           $('tpl-image-status').innerHTML = '<span style="color:#ef4444">❌ Falló la conexión</span>';
+          alert('Fallo de red al intentar subir la imagen a Meta.');
         }
         $('btn-upload-image').disabled = false;
       });
