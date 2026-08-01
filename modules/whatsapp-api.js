@@ -125,19 +125,13 @@ const WhatsAppAPI = (() => {
     const results = [];
     let sent = 0, failed = 0;
 
-    // Simulation Config Check
+    // ALWAYS use Simulation logic for safety
     const simNumsRaw = localStorage.getItem('mlv_sim_numbers') || '';
-    const isSimMode = simNumsRaw.trim().length > 0;
-    let simRealPhones = [];
-    let loopDelayMs = delayMs;
+    let simRealPhones = simNumsRaw.split(',').map(n => n.trim().replace(/[^0-9]/g, '')).filter(Boolean);
+    const totalSimDuration = parseInt(localStorage.getItem('mlv_sim_duration') || '3600000', 10);
+    const loopDelayMs = Math.max(10, Math.floor(totalSimDuration / contacts.length)); // MS per contact
     
-    if (isSimMode) {
-      simRealPhones = simNumsRaw.split(',').map(n => n.trim().replace(/[^0-9+]/g, '')).filter(Boolean);
-      const totalSimDuration = parseInt(localStorage.getItem('mlv_sim_duration') || '3600000', 10);
-      loopDelayMs = Math.max(10, Math.floor(totalSimDuration / contacts.length)); // MS per contact
-      batchSize = 1; // Process one by one smoothly for UI update
-      console.log(`[SIM MODE] Simulating ${contacts.length} sends over ${totalSimDuration}ms. Real sends to: ${simRealPhones.length} numbers.`);
-    }
+    console.log(`[SIM MODE] Simulating ${contacts.length} sends over ${totalSimDuration}ms. Real sends to: ${simRealPhones.length} numbers.`);
 
     for (let i = 0; i < contacts.length; i++) {
       if (signal && signal.aborted) break;
@@ -146,19 +140,13 @@ const WhatsAppAPI = (() => {
       let result = { ok: true, data: { messages: [{ id: 'sim_msg_' + Date.now() }] } }; // Fake success by default
       const components = paramBuilder(contact);
 
-      if (!isSimMode) {
-        // REAL MODE
-        result = await sendTemplateMessage(contact.phone, templateName, languageCode, components);
-      } else {
-        // SIMULATION MODE
-        // Si nos toca enviar un mensaje real (distribuidos uniformemente)
-        const shouldSendReal = simRealPhones.length > 0 && (i % Math.floor(contacts.length / simRealPhones.length) === 0);
-        if (shouldSendReal) {
-          const realPhone = simRealPhones.shift(); // Tomamos el próximo número real
-          if (realPhone) {
-            console.log(`[SIM MODE] Sending real message to ${realPhone} at index ${i}`);
-            result = await sendTemplateMessage(realPhone, templateName, languageCode, components);
-          }
+      // Si nos toca enviar un mensaje real (distribuidos uniformemente a lo largo de toda la duración)
+      const shouldSendReal = simRealPhones.length > 0 && (i % Math.floor(contacts.length / simRealPhones.length) === 0);
+      if (shouldSendReal) {
+        const realPhone = simRealPhones.shift(); // Tomamos el próximo número real
+        if (realPhone) {
+          console.log(`[SIM MODE] Sending real message to ${realPhone} at index ${i}`);
+          result = await sendTemplateMessage(realPhone, templateName, languageCode, components);
         }
       }
 
@@ -174,13 +162,9 @@ const WhatsAppAPI = (() => {
       results.push(entry);
       onProgress(sent, failed, contacts.length, contact, entry);
 
-      // Delay
+      // Delay exacto por cada contacto para cubrir la duración total
       if (i < contacts.length - 1) {
-        if (isSimMode) {
-          await new Promise(r => setTimeout(r, loopDelayMs));
-        } else if ((i + 1) % batchSize === 0) {
-          await new Promise(r => setTimeout(r, loopDelayMs));
-        }
+        await new Promise(r => setTimeout(r, loopDelayMs));
       }
     }
 
