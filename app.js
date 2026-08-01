@@ -56,6 +56,7 @@ function navigateTo(viewId) {
     campaigns:  { title: 'Campañas', sub: 'Historial y estado de envíos' },
     templates:  { title: 'Plantillas', sub: 'Mensajes aprobados por Meta' },
     reports:    { title: 'Reportes', sub: 'Estadísticas y análisis' },
+    billing:    { title: 'Facturación', sub: 'Estado de cuenta y pagos' },
     config:     { title: 'Configuración', sub: 'API de WhatsApp Business' },
   };
   const t = titles[viewId] || { title: viewId, sub: '' };
