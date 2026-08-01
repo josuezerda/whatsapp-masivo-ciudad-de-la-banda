@@ -226,8 +226,8 @@ const WhatsAppAPI = (() => {
   }
 
   function sanitizePhone(phone) {
-    // Elimina espacios, guiones, paréntesis; conserva el + inicial
-    return phone.toString().replace(/[\s\-().]/g, '');
+    // Elimina espacios, guiones, paréntesis, y el signo +
+    return phone.toString().replace(/[\s\-().+]/g, '');
   }
 
   function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
