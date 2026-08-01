@@ -319,7 +319,8 @@ function updateTemplatePreview(name) {
           const data = await res.json();
           if (data.id) {
             State.currentCampaignDraft.mediaId = data.id;
-            State.currentCampaignDraft.imageUrl = null; // Limpiar url si hay media ID
+            State.currentCampaignDraft.imageUrl = null;
+            localStorage.setItem('mlv_last_media_id', data.id); // Persistir para que sobreviva F5
             $('tpl-image-status').innerHTML = '<span style="color:#10b981">✅ Guardada en Meta</span>';
             const btn = $('btn-upload-image');
             btn.innerHTML = '<i data-lucide="check-circle"></i> Imagen Lista';
@@ -463,15 +464,11 @@ async function startCampaign() {
         
         // Header de imagen
         if (tpl.hasImage) {
-          if (State.currentCampaignDraft.mediaId) {
+          const mediaId = State.currentCampaignDraft.mediaId || localStorage.getItem('mlv_last_media_id');
+          if (mediaId) {
             comps.push({
               type: 'header',
-              parameters: [{ type: 'image', image: { id: State.currentCampaignDraft.mediaId } }]
-            });
-          } else if (State.currentCampaignDraft.imageUrl) {
-            comps.push({
-              type: 'header',
-              parameters: [{ type: 'image', image: { link: State.currentCampaignDraft.imageUrl } }]
+              parameters: [{ type: 'image', image: { id: mediaId } }]
             });
           }
         }
@@ -1193,13 +1190,18 @@ document.addEventListener('DOMContentLoaded', async () => {
     $$('.tpl-var').forEach(inp => { varValues[inp.dataset.name] = inp.value; });
     
     const comps = [];
-    if (templateData.hasImage) {
       if (State.currentCampaignDraft.mediaId) {
         comps.push({ type: 'header', parameters: [{ type: 'image', image: { id: State.currentCampaignDraft.mediaId } }] });
-      } else if (State.currentCampaignDraft.imageUrl) {
-        comps.push({ type: 'header', parameters: [{ type: 'image', image: { link: State.currentCampaignDraft.imageUrl } }] });
       } else {
-        showToast('warning', 'Aviso', 'No subiste ninguna imagen, el mensaje podría ser rechazado por Meta.');
+        // Intentar recuperar de localStorage
+        const savedMediaId = localStorage.getItem('mlv_last_media_id');
+        if (savedMediaId) {
+          State.currentCampaignDraft.mediaId = savedMediaId;
+          comps.push({ type: 'header', parameters: [{ type: 'image', image: { id: savedMediaId } }] });
+        } else {
+          showToast('error', 'Falta imagen', 'Tenés que subir la imagen primero antes de enviar la prueba.');
+          return;
+        }
       }
     }
     
