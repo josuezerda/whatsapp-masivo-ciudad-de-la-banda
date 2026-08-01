@@ -279,18 +279,55 @@ function updateTemplatePreview(name) {
   if (tpl.hasImage) {
     imageSection.innerHTML = `
       <div class="form-group" style="margin-bottom:16px">
-        <label class="form-label">🖼️ URL de imagen (header del mensaje)</label>
-        <input class="form-input" id="tpl-image-url" type="url"
-          placeholder="https://ejemplo.com/imagen.jpg"
-          value="${tpl.imageUrl || ''}"
-          style="border-color:rgba(245,158,11,0.4)">
+        <label class="form-label">🖼️ Imagen del mensaje (header)</label>
+        <div style="display:flex;gap:10px;align-items:center;">
+          <input type="file" id="tpl-image-file" accept="image/jpeg, image/png" style="display:none">
+          <button class="btn btn-secondary" id="btn-upload-image" style="flex:1">
+            <i data-lucide="upload"></i> Subir Imagen a WhatsApp
+          </button>
+          <span id="tpl-image-status" style="font-size:12px;color:var(--text-muted)">Ninguna imagen seleccionada</span>
+        </div>
         <div style="font-size:12px;color:var(--text-muted);margin-top:6px">
-          Debe ser una URL pública HTTPS con imagen JPG/PNG. Meta la descargará al enviar.
+          Sube la imagen directamente a los servidores de WhatsApp para adjuntarla en el envío masivo.
         </div>
       </div>`;
-    $('tpl-image-url')?.addEventListener('input', e => {
-      State.currentCampaignDraft.imageUrl = e.target.value;
-    });
+    
+    setTimeout(() => {
+      if (typeof lucide !== 'undefined') lucide.createIcons();
+      $('btn-upload-image').addEventListener('click', () => $('tpl-image-file').click());
+      $('tpl-image-file').addEventListener('change', async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        $('tpl-image-status').textContent = '⏳ Subiendo a Meta...';
+        $('btn-upload-image').disabled = true;
+        
+        try {
+          const cfg = WhatsAppAPI.getConfig();
+          const formData = new FormData();
+          formData.append('messaging_product', 'whatsapp');
+          formData.append('file', file);
+          formData.append('type', file.type);
+          
+          const res = await fetch(`https://graph.facebook.com/v20.0/${cfg.phoneNumberId}/media`, {
+            method: 'POST',
+            headers: { 'Authorization': `Bearer ${cfg.accessToken}` },
+            body: formData
+          });
+          const data = await res.json();
+          if (data.id) {
+            State.currentCampaignDraft.mediaId = data.id;
+            State.currentCampaignDraft.imageUrl = null; // Limpiar url si hay media ID
+            $('tpl-image-status').innerHTML = '<span style="color:#10b981">✅ Imagen subida y lista</span>';
+          } else {
+            $('tpl-image-status').innerHTML = '<span style="color:#ef4444">❌ Error al subir</span>';
+            console.error(data);
+          }
+        } catch (err) {
+          $('tpl-image-status').innerHTML = '<span style="color:#ef4444">❌ Falló la conexión</span>';
+        }
+        $('btn-upload-image').disabled = false;
+      });
+    }, 50);
   } else {
     imageSection.innerHTML = '';
   }
@@ -409,11 +446,18 @@ async function startCampaign() {
         const comps = [];
         
         // Header de imagen
-        if (tpl.hasImage && State.currentCampaignDraft.imageUrl) {
-          comps.push({
-            type: 'header',
-            parameters: [{ type: 'image', image: { link: State.currentCampaignDraft.imageUrl } }]
-          });
+        if (tpl.hasImage) {
+          if (State.currentCampaignDraft.mediaId) {
+            comps.push({
+              type: 'header',
+              parameters: [{ type: 'image', image: { id: State.currentCampaignDraft.mediaId } }]
+            });
+          } else if (State.currentCampaignDraft.imageUrl) {
+            comps.push({
+              type: 'header',
+              parameters: [{ type: 'image', image: { link: State.currentCampaignDraft.imageUrl } }]
+            });
+          }
         }
         
         // Variables del body
