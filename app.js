@@ -476,7 +476,7 @@ async function startCampaign() {
           }
         }
         
-        // Variables del body
+        // Variables del body (solo si la plantilla tiene variables definidas)
         if (tpl.variables && tpl.variables.length > 0) {
           const bodyParams = tpl.variables.map(v => {
             let val = varValues[v] || '';
@@ -488,31 +488,28 @@ async function startCampaign() {
         
         return comps;
       },
-      onProgress: (sent, total, contact, result) => {
-        if (result.status === 'sent') {
-          sentCount++;
-          Database.updateMsgStatus(contact.id, 'sent', result.msgId);
-        } else {
-          errorCount++;
-          Database.updateMsgStatus(contact.id, 'error');
-        }
-        const pct = Math.round(sent / total * 100);
+      onProgress: (sent, failed, totalContacts, contact, entry) => {
+        sentCount = sent;
+        errorCount = failed;
+        const pct = Math.round((sent + failed) / totalContacts * 100);
         const barEl = $('campaign-progress-bar');
         if (barEl) barEl.style.width = `${pct}%`;
         const pctEl = $('campaign-progress-pct');
         if (pctEl) pctEl.textContent = `${pct}%`;
         const sentEl = $('campaign-progress-sent');
-        if (sentEl) sentEl.textContent = sentCount.toLocaleString();
+        if (sentEl) sentEl.textContent = sent.toLocaleString();
         const errEl = $('campaign-progress-error');
-        if (errEl) errEl.textContent = errorCount.toLocaleString();
-        Campaigns.updateProgress(campaign.id, { sent: sentCount, error: errorCount });
+        if (errEl) errEl.textContent = failed.toLocaleString();
+        Campaigns.updateProgress(campaign.id, { sent, error: failed });
 
         // Log
+        const nombre = contact?.nombre || 'Contacto';
+        const phone = contact?.phone || '---';
         appendLog(
-          result.status === 'sent'
-            ? `✅ ${contact.nombre} (${contact.phone}) — OK`
-            : `❌ ${contact.nombre} (${contact.phone}) — ${result.error}`,
-          result.status === 'sent' ? 'success' : 'error'
+          entry.status === 'sent'
+            ? `✅ ${nombre} (${phone}) — OK`
+            : `❌ ${nombre} (${phone}) — ${entry.error || 'Error'}`,
+          entry.status === 'sent' ? 'success' : 'error'
         );
       },
       batchSize: 30,
