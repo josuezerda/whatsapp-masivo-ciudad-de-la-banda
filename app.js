@@ -431,8 +431,8 @@ async function startCampaign() {
     $('confirm-count').textContent = contacts.length.toLocaleString('es-AR');
   }
 
-  // Ir a vista de confirmación (Paso 2)
-  renderWizardStep(2);
+  // Ir a vista de progreso (Paso 3)
+  renderWizardStep(3);
   $('campaign-progress-name').textContent = campaignName;
   $('campaign-progress-total').textContent = contacts.length.toLocaleString();
   $('campaign-progress-bar').style.width = '0%';
