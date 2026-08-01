@@ -1218,12 +1218,28 @@ document.addEventListener('DOMContentLoaded', async () => {
     
     try {
       showToast('info', 'Enviando...', 'Mandando mensaje de prueba a ' + phone);
+      
+      console.log('--- ENVIANDO MENSAJE DE PRUEBA ---');
+      console.log('Teléfono (original):', phone);
+      console.log('Teléfono (saneado):', phone.toString().replace(/[\s\-().+]/g, ''));
+      console.log('Plantilla:', tplName);
+      console.log('Idioma:', templateData.language);
+      console.log('Componentes:', JSON.stringify(comps, null, 2));
+      
       const res = await WhatsAppAPI.sendTemplateMessage(phone, tplName, templateData.language, comps);
-      if (res.error) throw new Error(res.error.message || JSON.stringify(res.error));
-      showToast('success', '¡Enviado!', 'El mensaje de prueba se envió correctamente.');
+      
+      console.log('--- RESPUESTA DE META ---');
+      console.log(res);
+
+      if (res.error) {
+        throw new Error(res.error.message || res.error || JSON.stringify(res.error));
+      }
+      
+      showToast('success', '¡Enviado!', 'El mensaje de prueba fue aceptado por Meta.');
     } catch (e) {
+      console.error('Error enviando prueba:', e);
       showToast('error', 'Fallo de envío', 'Hubo un error al enviar el mensaje de prueba.');
-      alert('Error devuelto por Meta:\n\n' + e.message);
+      alert('META RECHAZÓ EL MENSAJE. MOTIVO:\n\n' + e.message);
     }
   });
   $('btn-wizard-back-2')?.addEventListener('click', () => renderWizardStep(1));
