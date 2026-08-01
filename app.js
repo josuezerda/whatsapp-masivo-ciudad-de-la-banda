@@ -1101,6 +1101,16 @@ document.addEventListener('DOMContentLoaded', async () => {
       showToast('success', 'Credenciales auto-configuradas', 'El token se inyectó de forma segura.');
     } catch(e) {}
   }
+  
+  // Auto-verificar conexión en background para mantener el badge verde
+  const cfg = WhatsAppAPI.getConfig();
+  if (cfg.accessToken && cfg.phoneNumberId) {
+    fetch(`https://graph.facebook.com/v20.0/${cfg.phoneNumberId}`, {
+      headers: { 'Authorization': `Bearer ${cfg.accessToken}` }
+    }).then(r => r.json()).then(data => {
+      if (!data.error) updateApiStatus(true, cfg.phoneNumberId);
+    }).catch(() => {});
+  }
 
   initNavigation();
   navigateTo('overview');
