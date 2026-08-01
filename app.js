@@ -1127,6 +1127,51 @@ document.addEventListener('DOMContentLoaded', async () => {
     
     renderWizardStep(2);
   });
+
+  $('btn-test-message')?.addEventListener('click', async () => {
+    const tplName = $('send-template')?.value;
+    if (!tplName) { showToast('error', 'Error', 'Seleccioná una plantilla primero'); return; }
+    
+    const phone = prompt('Ingresá el número de teléfono para recibir la prueba (incluí el código de país sin el +, ej: 5493851234567):');
+    if (!phone) return;
+    
+    const cfg = WhatsAppAPI.getConfig();
+    if (!cfg.accessToken) { showToast('error', 'Error', 'La API de Meta está desconectada. Revisá la Configuración.'); return; }
+    
+    const templateData = Templates.getByName(tplName);
+    const varValues = {};
+    $$('.tpl-var').forEach(inp => { varValues[inp.dataset.name] = inp.value; });
+    
+    const comps = [];
+    if (templateData.hasImage) {
+      if (State.currentCampaignDraft.mediaId) {
+        comps.push({ type: 'header', parameters: [{ type: 'image', image: { id: State.currentCampaignDraft.mediaId } }] });
+      } else if (State.currentCampaignDraft.imageUrl) {
+        comps.push({ type: 'header', parameters: [{ type: 'image', image: { link: State.currentCampaignDraft.imageUrl } }] });
+      } else {
+        showToast('warning', 'Aviso', 'No subiste ninguna imagen, el mensaje podría ser rechazado por Meta.');
+      }
+    }
+    
+    if (templateData.variables && templateData.variables.length > 0) {
+      const bodyParams = templateData.variables.map(v => {
+        let val = varValues[v] || '';
+        if (v === 'nombre') val = 'Usuario Prueba';
+        return { type: 'text', text: val };
+      });
+      comps.push({ type: 'body', parameters: bodyParams });
+    }
+    
+    try {
+      showToast('info', 'Enviando...', 'Mandando mensaje de prueba a ' + phone);
+      const res = await WhatsAppAPI.sendTemplateMessage(phone, tplName, templateData.language, comps);
+      if (res.error) throw new Error(res.error.message || JSON.stringify(res.error));
+      showToast('success', '¡Enviado!', 'El mensaje de prueba se envió correctamente.');
+    } catch (e) {
+      showToast('error', 'Fallo de envío', 'Hubo un error al enviar el mensaje de prueba.');
+      alert('Error devuelto por Meta:\n\n' + e.message);
+    }
+  });
   $('btn-wizard-back-2')?.addEventListener('click', () => renderWizardStep(1));
   $('btn-wizard-send')?.addEventListener('click', startCampaign);
   $('btn-stop-campaign')?.addEventListener('click', stopCampaign);
