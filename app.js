@@ -1191,6 +1191,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     $$('.tpl-var').forEach(inp => { varValues[inp.dataset.name] = inp.value; });
     
     const comps = [];
+    if (templateData.hasImage) {
       if (State.currentCampaignDraft.mediaId) {
         comps.push({ type: 'header', parameters: [{ type: 'image', image: { id: State.currentCampaignDraft.mediaId } }] });
       } else {
@@ -1204,6 +1205,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           return;
         }
       }
+    }
     
     if (templateData.variables && templateData.variables.length > 0) {
       const bodyParams = templateData.variables.map(v => {
