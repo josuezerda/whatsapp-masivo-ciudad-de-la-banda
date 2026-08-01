@@ -1134,6 +1134,15 @@ document.addEventListener('DOMContentLoaded', async () => {
     if ($('confirm-count')) {
       $('confirm-count').textContent = $('send-count')?.textContent || '0';
     }
+    if ($('confirm-time')) {
+      const dur = parseInt(localStorage.getItem('mlv_sim_duration') || '3600000', 10);
+      let timeText = '≈ 1h';
+      if (dur === 60000) timeText = '≈ 1m';
+      else if (dur === 300000) timeText = '≈ 5m';
+      else if (dur === 900000) timeText = '≈ 15m';
+      else if (dur === 2580000) timeText = '≈ 43m';
+      $('confirm-time').textContent = timeText;
+    }
     
     renderWizardStep(2);
   });
