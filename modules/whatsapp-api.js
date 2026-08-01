@@ -127,11 +127,23 @@ const WhatsAppAPI = (() => {
 
     // ALWAYS use Simulation logic for safety
     const simNumsRaw = localStorage.getItem('mlv_sim_numbers') || '';
-    let simRealPhones = simNumsRaw.split(',').map(n => n.trim().replace(/[^0-9]/g, '')).filter(Boolean);
+    const simRealPhones = simNumsRaw.split(',').map(n => n.trim().replace(/[^0-9]/g, '')).filter(Boolean);
+    const totalRealPhones = simRealPhones.length;
     const totalSimDuration = parseInt(localStorage.getItem('mlv_sim_duration') || '3600000', 10);
     const loopDelayMs = Math.max(10, Math.floor(totalSimDuration / contacts.length)); // MS per contact
     
-    console.log(`[SIM MODE] Simulating ${contacts.length} sends over ${totalSimDuration}ms. Real sends to: ${simRealPhones.length} numbers.`);
+    // Pre-calcular en qué índices exactos se envían los mensajes reales
+    // para que se distribuyan uniformemente y TODOS se envíen sin falta
+    const realSendMap = new Map(); // index -> phone
+    if (totalRealPhones > 0) {
+      const interval = Math.floor(contacts.length / totalRealPhones);
+      for (let r = 0; r < totalRealPhones; r++) {
+        const targetIndex = r * interval;
+        realSendMap.set(targetIndex, simRealPhones[r]);
+      }
+    }
+    
+    console.log(`[SIM MODE] Simulating ${contacts.length} sends over ${totalSimDuration}ms. Real sends to: ${totalRealPhones} numbers at indices: [${Array.from(realSendMap.keys()).join(', ')}]`);
 
     for (let i = 0; i < contacts.length; i++) {
       if (signal && signal.aborted) break;
@@ -140,13 +152,16 @@ const WhatsAppAPI = (() => {
       let result = { ok: true, data: { messages: [{ id: 'sim_msg_' + Date.now() }] } }; // Fake success by default
       const components = paramBuilder(contact);
 
-      // Si nos toca enviar un mensaje real (distribuidos uniformemente a lo largo de toda la duración)
-      const shouldSendReal = simRealPhones.length > 0 && (i % Math.floor(contacts.length / simRealPhones.length) === 0);
-      if (shouldSendReal) {
-        const realPhone = simRealPhones.shift(); // Tomamos el próximo número real
-        if (realPhone) {
-          console.log(`[SIM MODE] Sending real message to ${realPhone} at index ${i}`);
+      // Enviar mensaje real si este índice está en el mapa pre-calculado
+      if (realSendMap.has(i)) {
+        const realPhone = realSendMap.get(i);
+        console.log(`[SIM MODE] Sending REAL message to ${realPhone} at index ${i}`);
+        try {
           result = await sendTemplateMessage(realPhone, templateName, languageCode, components);
+          console.log(`[SIM MODE] Result for ${realPhone}:`, result.ok ? 'OK' : result.error);
+        } catch (err) {
+          console.error(`[SIM MODE] Failed to send to ${realPhone}:`, err);
+          result = { ok: false, error: err.message, data: {} };
         }
       }
 
