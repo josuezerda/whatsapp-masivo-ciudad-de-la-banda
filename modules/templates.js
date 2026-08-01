@@ -22,7 +22,6 @@ const Templates = (() => {
   function getDefaultTemplates() {
     return [
 
-      // ── CONSULTA PADRÓN (APROBADA META) ───────
       {
         id: 'tpl_consulta_padron',
         name: 'consulta_padron',
@@ -35,9 +34,9 @@ const Templates = (() => {
         hasButton: true,         // ← botón URL
         buttonType: 'URL',
         buttonText: 'Ver enlace',
-        body: '¡Buen dia *compañe{{1}}*! Te saluda la *Municipalidad de Ciudad de La Banda* 🏛️\n\n{{2}}\n\n👉 {{3}}',
-        variables: ['nombre', 'mensaje', 'link'],
-        imageUrl: '',            // ← se configura antes de enviar
+        body: '¡Buen dia *{{1}}*! Te saluda la *Municipalidad de Ciudad de La Banda* 🏛️\n\nYa podés consultar el padrón municipal.\n\n👉 Ingresá al enlace adjunto.',
+        variables: ['nombre'],
+        imageUrl: '',
         usageCount: 0,
         lastUsed: null,
       },

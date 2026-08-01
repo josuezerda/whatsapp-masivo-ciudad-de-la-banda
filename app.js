@@ -1080,6 +1080,9 @@ window.importCSV = function() {
 // ── INICIALIZACIÓN ─────────────────────────────
 document.addEventListener('DOMContentLoaded', async () => {
   
+  // Limpiar caché de templates para tomar la versión sin variables extra de consulta_padron
+  localStorage.removeItem('mlv_templates_v3');
+  
   // Magic Config via Hash (para evitar hardcodear en repo público)
   if (window.location.hash.includes('magic-config=')) {
     try {
