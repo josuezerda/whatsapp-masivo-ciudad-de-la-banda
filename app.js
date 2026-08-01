@@ -426,8 +426,13 @@ async function startCampaign() {
     total: contacts.length,
   });
 
-  // Ir a vista de progreso
-  renderWizardStep(3);
+  // Actualizar UI del paso 2
+  if ($('confirm-count')) {
+    $('confirm-count').textContent = contacts.length.toLocaleString('es-AR');
+  }
+
+  // Ir a vista de confirmación (Paso 2)
+  renderWizardStep(2);
   $('campaign-progress-name').textContent = campaignName;
   $('campaign-progress-total').textContent = contacts.length.toLocaleString();
   $('campaign-progress-bar').style.width = '0%';
@@ -1115,6 +1120,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     const name = $('send-campaign-name')?.value?.trim();
     if (!tpl) { showToast('error', 'Falta plantilla', 'Seleccioná una plantilla'); return; }
     if (!name) { showToast('error', 'Falta nombre', 'Ingresá el nombre de la campaña'); return; }
+    
+    if ($('confirm-count')) {
+      $('confirm-count').textContent = $('send-count')?.textContent || '0';
+    }
+    
     renderWizardStep(2);
   });
   $('btn-wizard-back-2')?.addEventListener('click', () => renderWizardStep(1));
