@@ -498,6 +498,9 @@ async function startCampaign() {
         if (pctEl) pctEl.textContent = `${pct}%`;
         const sentEl = $('campaign-progress-sent');
         if (sentEl) sentEl.textContent = sent.toLocaleString();
+        // Actualizar el contador grande verde de Enviados
+        const sent2El = $('campaign-progress-sent2');
+        if (sent2El) sent2El.textContent = sent.toLocaleString();
         const errEl = $('campaign-progress-error');
         if (errEl) errEl.textContent = failed.toLocaleString();
         Campaigns.updateProgress(campaign.id, { sent, error: failed });
@@ -521,6 +524,21 @@ async function startCampaign() {
     Database.save();
     showToast('success', '¡Campaña completada!', `${sentCount.toLocaleString()} mensajes enviados`);
     appendLog(`🎉 Campaña finalizada: ${sentCount} enviados, ${errorCount} errores`, 'success');
+
+    // Mostrar banner de éxito grande
+    const successBanner = document.createElement('div');
+    successBanner.id = 'campaign-success-banner';
+    successBanner.innerHTML = `
+      <div style="text-align:center;padding:40px 20px;background:linear-gradient(135deg,rgba(16,185,129,0.15),rgba(16,185,129,0.05));border:2px solid rgba(16,185,129,0.4);border-radius:16px;margin:24px 0;animation:fadeInScale 0.5s ease">
+        <div style="font-size:56px;margin-bottom:12px">🎉</div>
+        <div style="font-size:28px;font-weight:900;color:var(--success);margin-bottom:8px">¡Envío Completado al 100%!</div>
+        <div style="font-size:18px;color:rgba(255,255,255,0.8);margin-bottom:4px">${sentCount.toLocaleString()} mensajes enviados exitosamente</div>
+        <div style="font-size:14px;color:rgba(255,255,255,0.5)">${errorCount} errores · Campaña: ${campaignName}</div>
+        <button class="btn btn-primary mt-16" onclick="navigateTo('send');location.reload();">✨ Nueva Campaña</button>
+      </div>
+    `;
+    const stepEl = $('step-3');
+    if (stepEl) stepEl.querySelector('.card-body')?.prepend(successBanner);
 
   } catch (e) {
     showToast('error', 'Error en la campaña', e.message);
@@ -932,6 +950,10 @@ function updateApiStatus(connected, phone) {
   if (!pill) return;
   if (connected === undefined) connected = State.apiConnected;
 
+  // Guardar estado para que persista
+  State.apiConnected = connected;
+  if (phone) State.apiPhone = phone;
+
   const dot = pill.querySelector('.status-dot');
   const label = pill.querySelector('.status-label');
   if (connected) {
@@ -944,6 +966,18 @@ function updateApiStatus(connected, phone) {
     if (label) label.textContent = 'API Desconectada';
   }
 }
+
+// Re-verificar API cada 2 minutos para mantener badge verde
+setInterval(() => {
+  const cfg = WhatsAppAPI.getConfig();
+  if (cfg.accessToken && cfg.phoneNumberId) {
+    fetch(`https://graph.facebook.com/v20.0/${cfg.phoneNumberId}`, {
+      headers: { 'Authorization': `Bearer ${cfg.accessToken}` }
+    }).then(r => r.json()).then(data => {
+      if (!data.error) updateApiStatus(true, State.apiPhone || cfg.phoneNumberId);
+    }).catch(() => {});
+  }
+}, 120000);
 
 // ── REVEAL PASSWORD ────────────────────────────
 window.toggleReveal = function(fieldId) {
