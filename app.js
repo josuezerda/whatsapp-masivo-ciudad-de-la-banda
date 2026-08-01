@@ -1204,7 +1204,6 @@ document.addEventListener('DOMContentLoaded', async () => {
           return;
         }
       }
-    }
     
     if (templateData.variables && templateData.variables.length > 0) {
       const bodyParams = templateData.variables.map(v => {
