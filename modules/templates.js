@@ -34,8 +34,8 @@ const Templates = (() => {
         hasButton: true,         // ← botón URL
         buttonType: 'URL',
         buttonText: 'Ver enlace',
-        body: '¡Buen dia *{{1}}*! Te saluda la *Municipalidad de Ciudad de La Banda* 🏛️\n\nYa podés consultar el padrón municipal.\n\n👉 Ingresá al enlace adjunto.',
-        variables: ['nombre'],
+        body: '✌️ ¡Buen dia compañer@s!\n\nDe cara a la jornada electoral del próximo 2 de agosto, ya se encuentra habilitada la consulta rápida del padrón para que cada vecino y vecina sepa dónde vota.\n\n🗳️ Consulta tu lugar de votación con el botón de abajo.\n\n¡Compañero que consulta, compañero que organiza! ✌️\nPartido Justicialista',
+        variables: [],
         imageUrl: '',
         usageCount: 0,
         lastUsed: null,
