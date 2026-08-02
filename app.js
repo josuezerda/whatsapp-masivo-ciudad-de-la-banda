@@ -1217,25 +1217,45 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
     
     try {
-      showToast('info', 'Enviando...', 'Mandando mensaje de prueba a ' + phone);
+      showToast('info', 'Enviando...', 'Mandando mensaje de prueba...');
       
-      console.log('--- ENVIANDO MENSAJE DE PRUEBA ---');
-      console.log('Teléfono (original):', phone);
-      console.log('Teléfono (saneado):', phone.toString().replace(/[\s\-().+]/g, ''));
-      console.log('Plantilla:', tplName);
-      console.log('Idioma:', templateData.language);
-      console.log('Componentes:', JSON.stringify(comps, null, 2));
+      const sanitizedPhone = phone.toString().replace(/[\s\-().+]/g, '');
+      let phonesToTry = [sanitizedPhone];
       
-      const res = await WhatsAppAPI.sendTemplateMessage(phone, tplName, templateData.language, comps);
-      
-      console.log('--- RESPUESTA DE META ---');
-      console.log(res);
+      // Magia para Argentina: A veces Meta pide el 9, a veces no. Probamos ambos automáticamente.
+      if (sanitizedPhone.startsWith('549') && sanitizedPhone.length === 13) {
+        const without9 = '54' + sanitizedPhone.substring(3);
+        phonesToTry.push(without9);
+        console.log('Número argentino detectado. Se probarán ambos formatos:', phonesToTry);
+      }
 
-      if (res.error) {
-        throw new Error(res.error.message || res.error || JSON.stringify(res.error));
+      let successCount = 0;
+      let lastError = null;
+
+      for (const p of phonesToTry) {
+        console.log(`--- ENVIANDO A ${p} ---`);
+        try {
+          const res = await WhatsAppAPI.sendTemplateMessage(p, tplName, templateData.language, comps);
+          console.log(`Respuesta para ${p}:`, res);
+          if (res.error) {
+             console.error(`Fallo para ${p}:`, res.error);
+             lastError = res.error.message || res.error || JSON.stringify(res.error);
+          } else {
+             successCount++;
+             console.log(`¡Éxito para ${p}!`);
+          }
+        } catch(err) {
+          console.error(`Fallo catch para ${p}:`, err);
+          lastError = err.message;
+        }
+      }
+
+      if (successCount > 0) {
+        showToast('success', '¡Enviado!', `Se envió el mensaje correctamente. Por favor revisá tu WhatsApp.`);
+      } else {
+        throw new Error(lastError || 'Fallo desconocido en todos los intentos');
       }
       
-      showToast('success', '¡Enviado!', 'El mensaje de prueba fue aceptado por Meta.');
     } catch (e) {
       console.error('Error enviando prueba:', e);
       showToast('error', 'Fallo de envío', 'Hubo un error al enviar el mensaje de prueba.');
