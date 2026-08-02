@@ -310,7 +310,7 @@ function updateTemplatePreview(name) {
           const formData = new FormData();
           formData.append('messaging_product', 'whatsapp');
           formData.append('file', file);
-          formData.append('type', file.type);
+          formData.append('type', file.type.startsWith('image/') ? 'image' : 'document');
           
           const res = await fetch(`https://graph.facebook.com/v20.0/${cfg.phoneNumberId}/media`, {
             method: 'POST',
@@ -1217,43 +1217,44 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
     
     try {
-      showToast('info', 'Enviando...', 'Mandando mensaje de prueba...');
+      showToast('info', 'Enviando...', 'Mandando mensaje(s) de prueba...');
       
-      const sanitizedPhone = phone.toString().replace(/[\s\-().+]/g, '');
-      let phonesToTry = [sanitizedPhone];
-      
-      // Magia para Argentina: A veces Meta pide el 9, a veces no. Probamos ambos automáticamente.
-      if (sanitizedPhone.startsWith('549') && sanitizedPhone.length === 13) {
-        const without9 = '54' + sanitizedPhone.substring(3);
-        phonesToTry.push(without9);
-        console.log('Número argentino detectado. Se probarán ambos formatos:', phonesToTry);
-      }
-
+      // Separar por comas por si el usuario pega múltiples números
+      const rawPhones = phone.toString().split(',');
       let successCount = 0;
       let lastError = null;
 
-      for (const p of phonesToTry) {
-        console.log(`--- ENVIANDO A ${p} ---`);
-        try {
-          const res = await WhatsAppAPI.sendTemplateMessage(p, tplName, templateData.language, comps);
-          console.log(`Respuesta para ${p}:`, res);
-          if (res.error) {
-             console.error(`Fallo para ${p}:`, res.error);
-             lastError = res.error.message || res.error || JSON.stringify(res.error);
-          } else {
-             successCount++;
-             console.log(`¡Éxito para ${p}!`);
+      for (let raw of rawPhones) {
+        const sanitizedPhone = raw.replace(/[\s\-().+]/g, '');
+        if (!sanitizedPhone) continue;
+
+        let phonesToTry = [sanitizedPhone];
+        
+        // Magia para Argentina: A veces Meta pide el 9, a veces no. Probamos ambos automáticamente.
+        if (sanitizedPhone.startsWith('549') && sanitizedPhone.length === 13) {
+          const without9 = '54' + sanitizedPhone.substring(3);
+          phonesToTry.push(without9);
+        }
+
+        for (const p of phonesToTry) {
+          try {
+            const res = await WhatsAppAPI.sendTemplateMessage(p, tplName, templateData.language, comps);
+            if (res.error) {
+               lastError = res.error.message || res.error || JSON.stringify(res.error);
+            } else {
+               successCount++;
+               break; // Si tuvo éxito con un formato, no probamos el otro para este mismo número
+            }
+          } catch(err) {
+            lastError = err.message;
           }
-        } catch(err) {
-          console.error(`Fallo catch para ${p}:`, err);
-          lastError = err.message;
         }
       }
 
       if (successCount > 0) {
-        showToast('success', '¡Enviado!', `Se envió el mensaje correctamente. Por favor revisá tu WhatsApp.`);
+        showToast('success', '¡Enviado!', `Se enviaron ${successCount} mensaje(s) correctamente. Por favor revisá los WhatsApp.`);
       } else {
-        throw new Error(lastError || 'Fallo desconocido en todos los intentos');
+        throw new Error(lastError || 'Fallo desconocido o números inválidos');
       }
       
     } catch (e) {
